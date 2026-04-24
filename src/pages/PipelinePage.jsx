@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import { useDeals } from '../hooks/useDeals'
-import { DEAL_TYPES } from '../constants/dealTypes'
+import { DEAL_TYPES, getDealType, isOtherLikeActive } from '../constants/dealTypes'
 import { STEP_TYPES } from '../constants/stepTypes'
 import { STAGE_COLORS, STAGE_BG } from '../constants/stageColors'
 import { fmt$, fmtDate, noteFmt } from '../utils/format'
@@ -20,7 +20,7 @@ const FieldInput = ({ type, value, onChange, placeholder, mono, onKeyDown, input
 function TodayCard({ d, stages, onOpen, onClear, overdue, noStep }) {
   const ns = d.next_step
   const st = STEP_TYPES.find(t => t.key === ns?.type)
-  const dt = DEAL_TYPES.find(t => t.key === d.deal_type)
+  const dt = getDealType(d.deal_type)
   const stageName = stages[d.stage] || ''
   const stageColor = STAGE_COLORS[d.stage] || STAGE_COLORS[0]
   const stageBg    = STAGE_BG[d.stage]     || STAGE_BG[0]
@@ -312,7 +312,7 @@ export default function PipelinePage() {
                     const ns = d.next_step
                     const od = ns?.reminderAt && isOverdue(ns.reminderAt)
                     const st = STEP_TYPES.find(t => t.key === ns?.type)
-                    const dt = DEAL_TYPES.find(t => t.key === d.deal_type)
+                    const dt = getDealType(d.deal_type)
                     return (
                       <div key={d.id} className="deal-card"
                         draggable="true"
@@ -379,7 +379,7 @@ export default function PipelinePage() {
                   <div style={{ color:'var(--text-3)', fontSize:12, marginTop:2 }}>{deal.business || '—'}</div>
                 </div>
                 <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0, marginLeft:10 }}>
-                  {deal.deal_type && (() => { const dt = DEAL_TYPES.find(t=>t.key===deal.deal_type); return dt ? <span style={{ fontSize:10, background:dt.bg, color:dt.color, borderRadius:5, padding:'2px 8px', fontWeight:600 }}>{dt.icon} {dt.label}</span> : null })()}
+                  {deal.deal_type && (() => { const dt = getDealType(deal.deal_type); return dt ? <span style={{ fontSize:10, background:dt.bg, color:dt.color, borderRadius:5, padding:'2px 8px', fontWeight:600 }}>{dt.icon} {dt.label}</span> : null })()}
                   {deal.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color:stageColor, fontWeight:600 }}>{fmt$(deal.value)}</div>}
                   <button onClick={()=>setActiveTab('contact')} title="Edit deal" style={{ background:'none', border:'1px solid var(--border)', borderRadius:6, color:'var(--text-3)', fontSize:13, lineHeight:1, cursor:'pointer', padding:'3px 7px' }}>✏️</button>
                   <button onClick={()=>setPanelId(null)} style={{ background:'none', border:'none', color:'var(--text-3)', fontSize:20, lineHeight:1, cursor:'pointer', padding:'0 2px' }}>×</button>
@@ -514,7 +514,7 @@ export default function PipelinePage() {
                     <Label>🎯 Deal Type</Label>
                     <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
                       {DEAL_TYPES.map(t => {
-                        const active = deal.deal_type === t.key
+                        const active = t.key === 'other' ? isOtherLikeActive(deal.deal_type) : deal.deal_type === t.key
                         return (
                           <button key={t.key} onClick={()=>upd(deal.id, { deal_type: active ? '' : t.key })}
                             style={{ padding:'5px 10px', borderRadius:6, border:`1px solid ${active?t.color:'var(--border)'}`, background: active?t.bg:'var(--white)', color: active?t.color:'var(--text-2)', fontSize:11, fontWeight: active?600:400, cursor:'pointer' }}>
@@ -523,6 +523,12 @@ export default function PipelinePage() {
                         )
                       })}
                     </div>
+                    {isOtherLikeActive(deal.deal_type) && (
+                      <input type="text" placeholder="Custom type (e.g. copywriting) — leave blank for Other"
+                        value={deal.deal_type === 'other' ? '' : (deal.deal_type || '')}
+                        onChange={e => upd(deal.id, { deal_type: e.target.value || 'other' })}
+                        style={{ width:'100%', background:'var(--white)', border:'1px solid var(--border)', borderRadius:7, padding:'7px 11px', color:'var(--text-1)', fontSize:12, marginTop:7, boxShadow:'var(--shadow-sm)' }} />
+                    )}
                   </div>
                   <div style={{ borderTop:'1px solid var(--border-light)', paddingTop:16, marginTop:4 }}>
                     <button onClick={()=>{ deleteDeal(deal.id); setPanelId(null) }}
@@ -568,13 +574,22 @@ export default function PipelinePage() {
               <div>
                 <Label>Deal Type</Label>
                 <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
-                  {DEAL_TYPES.map(t => (
-                    <button key={t.key} onClick={()=>setFormType(formType===t.key?'':t.key)}
-                      style={{ padding:'5px 9px', borderRadius:6, border:`1px solid ${formType===t.key?t.color:'var(--border)'}`, background: formType===t.key?t.bg:'var(--white)', color: formType===t.key?t.color:'var(--text-2)', fontSize:11, fontWeight: formType===t.key?600:400, cursor:'pointer' }}>
-                      {t.icon} {t.label}
-                    </button>
-                  ))}
+                  {DEAL_TYPES.map(t => {
+                    const active = t.key === 'other' ? isOtherLikeActive(formType) : formType === t.key
+                    return (
+                      <button key={t.key} onClick={()=>setFormType(active ? '' : t.key)}
+                        style={{ padding:'5px 9px', borderRadius:6, border:`1px solid ${active?t.color:'var(--border)'}`, background: active?t.bg:'var(--white)', color: active?t.color:'var(--text-2)', fontSize:11, fontWeight: active?600:400, cursor:'pointer' }}>
+                        {t.icon} {t.label}
+                      </button>
+                    )
+                  })}
                 </div>
+                {isOtherLikeActive(formType) && (
+                  <input type="text" placeholder="Custom type (e.g. copywriting) — leave blank for Other"
+                    value={formType === 'other' ? '' : formType}
+                    onChange={e => setFormType(e.target.value || 'other')}
+                    style={{ width:'100%', background:'var(--white)', border:'1px solid var(--border)', borderRadius:7, padding:'7px 11px', color:'var(--text-1)', fontSize:12, marginTop:7, boxShadow:'var(--shadow-sm)' }} />
+                )}
               </div>
               <div>
                 <Label>Stage</Label>
