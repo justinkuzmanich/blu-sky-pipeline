@@ -22,6 +22,7 @@ export default function Login() {
 
   return (
     <div className="auth-page">
+      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:18 }}>
       <div className="auth-card">
         <div className="auth-title">Blu Sky Pipeline</div>
         <div className="auth-subtitle">Sign in to your account</div>
@@ -45,6 +46,10 @@ export default function Login() {
         <div className="auth-link">
           Don't have an account? <Link to="/signup">Create one</Link>
         </div>
+      </div>
+      <div style={{ fontSize:11, color:'var(--text-3)', letterSpacing:'0.5px', textAlign:'center' }}>
+        Blu Sky Code 2026
+      </div>
       </div>
     </div>
   )
