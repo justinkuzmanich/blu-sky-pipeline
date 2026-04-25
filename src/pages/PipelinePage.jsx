@@ -400,7 +400,7 @@ export default function PipelinePage() {
                   <button className="add-here" onClick={()=>{ setFormStage(si); setShowForm(true) }}
                     style={{ width:'100%', background:'transparent', border:'1px dashed #7A6F62', borderRadius:7, color:'#6B6057', padding:'6px', fontSize:11, display:'flex', alignItems:'center', justifyContent:'center', gap:4, cursor:'pointer' }}>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    Add here
+                    Add deal
                   </button>
                 </div>
               </div>
