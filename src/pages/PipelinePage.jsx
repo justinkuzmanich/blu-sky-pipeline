@@ -318,7 +318,7 @@ export default function PipelinePage() {
         )}
 
         {view === 'board' && (
-        <div className="board" style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', alignItems:'flex-start', background:'var(--board-bg)' }}>
+        <div className="board" style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', scrollPadding:'0 14px', alignItems:'flex-start', background:'var(--board-bg)' }}>
           {stages.map((stage, si) => {
             const dot   = STAGE_COLORS[si] || STAGE_COLORS[0]
             const sbg   = STAGE_BG[si]     || STAGE_BG[0]
