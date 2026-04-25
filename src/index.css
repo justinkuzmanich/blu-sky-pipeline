@@ -63,6 +63,36 @@ textarea { resize: none; }
   .topbar-title           { display: none !important; }
 }
 
+/* Mobile summary bar */
+@media (max-width: 640px) {
+  .summary-bar            { padding: 12px 14px !important; }
+  .summary-total          { min-width: 0 !important; padding-right: 14px !important; }
+  .summary-total-val      { font-size: 20px !important; }
+  .summary-stages         { display: none !important; }
+  .summary-divider        { display: none !important; }
+  .summary-kpis           { gap: 18px !important; margin-left: auto !important; }
+  .summary-kpi-val        { font-size: 12px !important; }
+  .summary-kpi-label      { font-size: 9px !important; }
+}
+
+/* Mobile side panel — full-screen overlay */
+@media (max-width: 640px) {
+  .deal-panel {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    z-index: 200 !important;
+    border-left: none !important;
+  }
+}
+
+/* Mobile board — bigger tap targets */
+@media (max-width: 640px) {
+  .move-btn, .note-del    { opacity: 1 !important; }
+  .deal-card              { padding: 13px 14px !important; }
+  .stage-pill-btn         { padding: 5px 12px !important; font-size: 12px !important; }
+}
+
 /* Auth pages */
 .auth-page {
   min-height: 100vh;
