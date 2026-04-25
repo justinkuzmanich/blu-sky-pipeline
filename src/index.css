@@ -48,6 +48,21 @@ textarea { resize: none; }
 .deal-card[draggable="true"] { cursor: grab; }
 .deal-card[draggable="true"]:active { cursor: grabbing; opacity: 0.7; }
 
+/* Mobile top bar overrides */
+@media (max-width: 640px) {
+  .topbar                 { padding: 0 12px !important; }
+  .topbar-title           { font-size: 14px !important; margin-right: 10px !important; letter-spacing: -0.2px !important; }
+  .topbar-addbtn          { margin-right: 10px !important; padding: 6px 9px !important; }
+  .topbar-addbtn-label    { display: none !important; }
+  .topbar-nav             { gap: 12px !important; }
+  .topbar-nav-btn         { font-size: 12px !important; }
+  .topbar-user-name       { display: none !important; }
+  .topbar-overdue         { padding: 2px 7px !important; font-size: 10px !important; margin-left: 8px !important; }
+}
+@media (max-width: 400px) {
+  .topbar-title           { display: none !important; }
+}
+
 /* Auth pages */
 .auth-page {
   min-height: 100vh;

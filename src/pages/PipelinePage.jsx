@@ -145,30 +145,30 @@ export default function PipelinePage() {
     <div style={{ height:'100vh', background:'var(--cream)', color:'var(--text-1)', fontFamily:"'DM Sans',sans-serif", display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
       {/* ── TOP BAR ── */}
-      <div style={{ background:'#FFFFFF', borderBottom:'1px solid #E8E2D9', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
-        <span style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:17, color:'var(--text-1)', letterSpacing:'-0.3px', marginRight:20 }}>Blu Sky Pipeline</span>
-        <button onClick={() => { setShowForm(true); setFormStage(0) }}
+      <div className="topbar" style={{ background:'#FFFFFF', borderBottom:'1px solid #E8E2D9', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
+        <span className="topbar-title" style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:17, color:'var(--text-1)', letterSpacing:'-0.3px', marginRight:20 }}>Blu Sky Pipeline</span>
+        <button className="topbar-addbtn" onClick={() => { setShowForm(true); setFormStage(0) }}
           style={{ background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:7, padding:'6px 14px', fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:5, cursor:'pointer', letterSpacing:'0.1px', marginRight:24, boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          Add Lead
+          <span className="topbar-addbtn-label">Add Lead</span>
         </button>
-        <nav style={{ display:'flex', alignItems:'center', gap:20 }}>
-          {[['board','Pipeline'],['today','Today View']].map(([v, label]) => (
-            <button key={v} onClick={()=>setView(v)}
+        <nav className="topbar-nav" style={{ display:'flex', alignItems:'center', gap:20 }}>
+          {[['board','Pipeline'],['today','Today']].map(([v, label]) => (
+            <button key={v} className="topbar-nav-btn" onClick={()=>setView(v)}
               style={{ background:'none', border:'none', borderBottom:`2px solid ${view===v ? 'var(--text-1)' : 'transparent'}`, color:'var(--text-1)', fontSize:13, fontWeight: view===v ? 600 : 400, cursor:'pointer', padding:'4px 0', letterSpacing:'0.1px', transition:'border-color 0.15s' }}>
               {label}
             </button>
           ))}
         </nav>
         {overdueCount > 0 && (
-          <span style={{ fontSize:11, color:'#B91C1C', fontWeight:600, background:'#FEE2E2', border:'1px solid #FECACA', borderRadius:20, padding:'2px 9px', marginLeft:16 }}>⚠ {overdueCount} overdue</span>
+          <span className="topbar-overdue" style={{ fontSize:11, color:'#B91C1C', fontWeight:600, background:'#FEE2E2', border:'1px solid #FECACA', borderRadius:20, padding:'2px 9px', marginLeft:16 }}>⚠ {overdueCount} overdue</span>
         )}
 
         {/* Right side: account */}
         <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:12 }}>
-          <span style={{ fontSize:12, color:'var(--text-3)' }}>{profile?.display_name || user?.email}</span>
+          <span className="topbar-user-name" style={{ fontSize:12, color:'var(--text-3)' }}>{profile?.display_name || user?.email}</span>
           <Link to="/account" title="Account settings"
-            style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:30, height:30, borderRadius:'50%', background:'var(--cream)', border:'1px solid var(--border)', color:'var(--text-2)', textDecoration:'none', fontSize:13, fontWeight:600 }}>
+            style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:30, height:30, borderRadius:'50%', background:'var(--cream)', border:'1px solid var(--border)', color:'var(--text-2)', textDecoration:'none', fontSize:13, fontWeight:600, flexShrink:0 }}>
             {(profile?.display_name || user?.email || '?').charAt(0).toUpperCase()}
           </Link>
         </div>
