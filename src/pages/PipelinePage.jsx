@@ -36,7 +36,7 @@ function TodayCard({ d, stages, onOpen, onClear, overdue, noStep }) {
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
           <span style={{ fontSize:11, background:stageBg, color:stageColor, border:`1px solid ${stageColor}33`, borderRadius:20, padding:'1px 7px', fontWeight:600 }}>{stageName}</span>
-          {dt && <span style={{ fontSize:10, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 6px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
+          {dt && <span style={{ fontSize:12, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 6px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
           {d.value > 0 && <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:stageColor, fontWeight:600 }}>{fmt$(d.value)}</span>}
           {ns && <span style={{ fontSize:11, color: overdue ? '#B91C1C' : 'var(--text-3)' }}>{overdue ? '⚠ ' : '🕐 '}{fmtDate(ns.reminderAt)}</span>}
           {ns?.note && <span style={{ fontSize:11, color:'var(--text-3)', fontStyle:'italic' }}>"{ns.note}"</span>}
@@ -367,7 +367,7 @@ export default function PipelinePage() {
                           </div>
                           <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:3, flexShrink:0 }}>
                             {d.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color:dot, fontWeight:600 }}>{fmt$(d.value)}</div>}
-                            {dt && <span style={{ fontSize:9, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 5px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
+                            {dt && <span style={{ fontSize:11, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 5px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
                           </div>
                         </div>
 
@@ -419,7 +419,7 @@ export default function PipelinePage() {
                   <div style={{ color:'var(--text-3)', fontSize:12, marginTop:2 }}>{deal.business || '—'}</div>
                 </div>
                 <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0, marginLeft:10 }}>
-                  {deal.deal_type && (() => { const dt = getDealType(deal.deal_type); return dt ? <span style={{ fontSize:10, background:dt.bg, color:dt.color, borderRadius:5, padding:'2px 8px', fontWeight:600 }}>{dt.icon} {dt.label}</span> : null })()}
+                  {deal.deal_type && (() => { const dt = getDealType(deal.deal_type); return dt ? <span style={{ fontSize:12, background:dt.bg, color:dt.color, borderRadius:5, padding:'2px 8px', fontWeight:600 }}>{dt.icon} {dt.label}</span> : null })()}
                   {deal.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color:stageColor, fontWeight:600 }}>{fmt$(deal.value)}</div>}
                   <button onClick={()=>setActiveTab('contact')} title="Edit deal" style={{ background:'none', border:'1px solid var(--border)', borderRadius:6, color:'var(--text-3)', fontSize:13, lineHeight:1, cursor:'pointer', padding:'3px 7px' }}>✏️</button>
                   <button onClick={()=>setPanelId(null)} style={{ background:'none', border:'none', color:'var(--text-3)', fontSize:20, lineHeight:1, cursor:'pointer', padding:'0 2px' }}>×</button>
@@ -557,7 +557,7 @@ export default function PipelinePage() {
                         const active = t.key === 'other' ? isOtherLikeActive(deal.deal_type) : deal.deal_type === t.key
                         return (
                           <button key={t.key} onClick={()=>upd(deal.id, { deal_type: active ? '' : t.key })}
-                            style={{ padding:'5px 10px', borderRadius:6, border:`1px solid ${active?t.color:'var(--border)'}`, background: active?t.bg:'var(--white)', color: active?t.color:'var(--text-2)', fontSize:11, fontWeight: active?600:400, cursor:'pointer' }}>
+                            style={{ padding:'5px 10px', borderRadius:6, border:`1px solid ${active?t.color:'var(--border)'}`, background: active?t.bg:'var(--white)', color: active?t.color:'var(--text-2)', fontSize:13, fontWeight: active?600:400, cursor:'pointer' }}>
                             {t.icon} {t.label}
                           </button>
                         )
@@ -618,7 +618,7 @@ export default function PipelinePage() {
                     const active = t.key === 'other' ? isOtherLikeActive(formType) : formType === t.key
                     return (
                       <button key={t.key} onClick={()=>setFormType(active ? '' : t.key)}
-                        style={{ padding:'5px 9px', borderRadius:6, border:`1px solid ${active?t.color:'var(--border)'}`, background: active?t.bg:'var(--white)', color: active?t.color:'var(--text-2)', fontSize:11, fontWeight: active?600:400, cursor:'pointer' }}>
+                        style={{ padding:'5px 9px', borderRadius:6, border:`1px solid ${active?t.color:'var(--border)'}`, background: active?t.bg:'var(--white)', color: active?t.color:'var(--text-2)', fontSize:13, fontWeight: active?600:400, cursor:'pointer' }}>
                         {t.icon} {t.label}
                       </button>
                     )
