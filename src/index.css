@@ -15,6 +15,22 @@
   --shadow-lg:   0 12px 36px rgba(0,0,0,0.18), 0 4px 8px rgba(0,0,0,0.08);
 }
 
+[data-theme="dark"] {
+  --cream:       #1B1917;
+  --cream-dark:  #2A2724;
+  --cream-mid:   #322E2A;
+  --border:      #4A4540;
+  --border-light:#3A3631;
+  --text-1:      #F7F4EF;
+  --text-2:      #D4CFC7;
+  --text-3:      #9A938A;
+  --text-4:      #6E665E;
+  --white:       #252220;
+  --shadow-sm:   0 2px 6px rgba(0,0,0,0.45), 0 1px 2px rgba(0,0,0,0.30);
+  --shadow-md:   0 4px 14px rgba(0,0,0,0.55), 0 2px 4px rgba(0,0,0,0.35);
+  --shadow-lg:   0 12px 36px rgba(0,0,0,0.65), 0 4px 8px rgba(0,0,0,0.40);
+}
+
 html, body, #root {
   height: 100%;
   margin: 0;

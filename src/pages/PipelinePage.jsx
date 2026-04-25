@@ -7,6 +7,7 @@ import { STEP_TYPES } from '../constants/stepTypes'
 import { STAGE_COLORS, STAGE_BG } from '../constants/stageColors'
 import { fmt$, fmtDate, noteFmt } from '../utils/format'
 import { isOverdue, isDueToday } from '../utils/dates'
+import ThemeToggle from '../components/ui/ThemeToggle'
 
 const Label = ({ children }) => (
   <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.7px', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 5 }}>{children}</div>
@@ -176,6 +177,7 @@ export default function PipelinePage() {
         {/* Right side: account */}
         <div style={{ marginLeft:'auto', display:'flex', alignItems:'center', gap:12 }}>
           <span className="topbar-user-name" style={{ fontSize:12, color:'var(--text-3)' }}>{profile?.display_name || user?.email}</span>
+          <ThemeToggle />
           <Link to="/account" title="Account settings"
             style={{ display:'inline-flex', alignItems:'center', justifyContent:'center', width:30, height:30, borderRadius:'50%', background:'var(--cream)', border:'1px solid var(--border)', color:'var(--text-2)', textDecoration:'none', fontSize:13, fontWeight:600, flexShrink:0 }}>
             {(profile?.display_name || user?.email || '?').charAt(0).toUpperCase()}
