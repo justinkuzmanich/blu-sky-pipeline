@@ -218,13 +218,13 @@ export default function PipelinePage() {
 
       {/* ── SUMMARY BAR ── */}
       <div className="summary-bar" style={{ background:'var(--white)', borderBottom:'1px solid var(--border-light)', padding:'14px 24px', display:'flex', alignItems:'center', gap:0, flexShrink:0 }}>
-        <div className="summary-total" style={{ minWidth:160, paddingRight:28 }}>
+        <div className="summary-total" style={{ minWidth:160, paddingRight:14 }}>
           <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:3 }}>Total Pipeline</div>
           <div className="summary-total-val" style={{ fontFamily:"'Libre Baskerville',serif", fontSize:24, fontWeight:700, color:'var(--text-1)', letterSpacing:'-0.5px', lineHeight:1 }}>{fmt$(grandTotal)}</div>
           <div style={{ fontSize:11, color:'var(--text-3)', marginTop:4 }}>{deals.length} deal{deals.length !== 1 ? 's' : ''}</div>
         </div>
 
-        <div className="summary-divider" style={{ width:1, background:'var(--border-light)', alignSelf:'stretch', marginRight:28 }} />
+        <div className="summary-divider" style={{ width:1, background:'var(--border-light)', alignSelf:'stretch', marginRight:14 }} />
 
         <div className="summary-stages" style={{ flex:1, minWidth:0 }}>
           <button onClick={() => setStagesOpen(o => !o)}
