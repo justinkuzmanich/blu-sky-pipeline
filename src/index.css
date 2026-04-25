@@ -95,7 +95,7 @@ textarea { resize: none; }
 
 /* Mobile top bar overrides */
 @media (max-width: 640px) {
-  .topbar                 { padding: 0 12px !important; }
+  .topbar                 { padding: 0 12px 0 6px !important; }
   .topbar-title           { font-size: 14px !important; margin-right: 10px !important; letter-spacing: -0.2px !important; }
   .topbar-addbtn          { margin-right: 10px !important; padding: 6px 9px !important; }
   .topbar-addbtn-label    { display: none !important; }
