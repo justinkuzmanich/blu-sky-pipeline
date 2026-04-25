@@ -76,6 +76,15 @@ export default function PipelinePage() {
   const [dragOver, setDragOver]       = useState(null)
   const [view, setView]               = useState('board')
   const [formError, setFormError]     = useState('')
+  const [stagesOpen, setStagesOpen]   = useState(true)
+
+  const scrollToStage = (si) => {
+    setView('board')
+    setTimeout(() => {
+      document.getElementById(`stage-col-${si}`)?.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' })
+    }, 60)
+  }
+
   const nameRef = useRef(null)
   const noteRef = useRef(null)
 
@@ -185,8 +194,13 @@ export default function PipelinePage() {
         <div className="summary-divider" style={{ width:1, background:'var(--border-light)', alignSelf:'stretch', marginRight:28 }} />
 
         <div className="summary-stages" style={{ flex:1, minWidth:0 }}>
-          <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:8 }}>By Stage</div>
+          <button onClick={() => setStagesOpen(o => !o)}
+            style={{ background:'none', border:'none', cursor:'pointer', display:'inline-flex', alignItems:'center', gap:6, padding:0, marginBottom: stagesOpen ? 8 : 0 }}>
+            <span style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600 }}>By Stage</span>
+            <span style={{ fontSize:11, color:'var(--text-3)', fontWeight:600, lineHeight:1 }}>{stagesOpen ? '▾' : '▸'}</span>
+          </button>
 
+          {stagesOpen && <>
           {/* Desktop: horizontal progress bar with inline labels */}
           <div className="summary-stages-desktop">
             <div style={{ display:'flex', height:4, borderRadius:4, overflow:'hidden', background:'var(--cream-dark)', marginBottom:10 }}>
@@ -205,7 +219,8 @@ export default function PipelinePage() {
                   cumPct += pct
                   if (!count || pct === 0) return null
                   return (
-                    <div key={si} style={{ position:'absolute', left:left+'%', top:0, display:'flex', alignItems:'center', gap:5, transform: left > 72 ? 'translateX(-100%)' : 'none', whiteSpace:'nowrap' }}>
+                    <div key={si} onClick={() => scrollToStage(si)}
+                      style={{ position:'absolute', left:left+'%', top:0, display:'flex', alignItems:'center', gap:5, transform: left > 72 ? 'translateX(-100%)' : 'none', whiteSpace:'nowrap', cursor:'pointer' }}>
                       <div style={{ width:6, height:6, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
                       <span style={{ fontSize:11, color:'var(--text-2)' }}>{s}</span>
                       <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color: si===stages.length-1 ? '#2D8A5E' : 'var(--text-1)', fontWeight:500 }}>{fmt$(stageTotal(si))}</span>
@@ -225,7 +240,7 @@ export default function PipelinePage() {
               const pct = grandTotal > 0 ? (stageTotal(si) / grandTotal) * 100 : 0
               const isLast = si === stages.length - 1
               return (
-                <div key={si} style={{ marginBottom: 10 }}>
+                <div key={si} onClick={() => scrollToStage(si)} style={{ marginBottom: 10, cursor:'pointer' }}>
                   <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                     <span style={{ width:8, height:8, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
                     <span style={{ fontSize:13, color:'var(--text-2)' }}>{s}</span>
@@ -239,6 +254,7 @@ export default function PipelinePage() {
               )
             })}
           </div>
+          </>}
         </div>
 
         <div className="summary-divider" style={{ width:1, background:'var(--border-light)', alignSelf:'stretch', margin:'0 28px' }} />
@@ -310,6 +326,7 @@ export default function PipelinePage() {
             const isLast  = si === stages.length - 1
             return (
               <div key={si}
+                id={`stage-col-${si}`}
                 className={`drop-zone stage-col${dragOver === si ? ' drag-over' : ''}`}
                 onDragOver={e => { e.preventDefault(); setDragOver(si) }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
