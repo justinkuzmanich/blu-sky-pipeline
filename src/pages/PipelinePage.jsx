@@ -156,7 +156,7 @@ export default function PipelinePage() {
 
       {/* ── TOP BAR ── */}
       <div className="topbar" style={{ background:'var(--white)', borderBottom:'1px solid var(--topbar-border)', padding:'0 24px 0 12px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
-        <span className="topbar-title" style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:17, color:'var(--text-1)', letterSpacing:'-0.3px', marginRight:20 }}>Blu Sky Pipeline</span>
+        <span className="topbar-title" style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:17, color:'var(--text-1)', letterSpacing:'-0.3px', marginRight:20, paddingLeft:10, marginLeft:-15 }}>Blu Sky Pipeline</span>
         <button className="topbar-addbtn" onClick={() => { setShowForm(true); setFormStage(0) }}
           style={{ background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:7, padding:'6px 14px', fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:5, cursor:'pointer', letterSpacing:'0.1px', marginRight:24, boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
