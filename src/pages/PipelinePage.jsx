@@ -37,7 +37,7 @@ function TodayCard({ d, stages, onOpen, onClear, overdue, noStep }) {
         <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
           <span style={{ fontSize:11, background:stageBg, color:stageColor, border:`1px solid ${stageColor}33`, borderRadius:20, padding:'1px 7px', fontWeight:600 }}>{stageName}</span>
           {dt && <span style={{ fontSize:10, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 6px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
-          {d.value > 0 && <span style={{ fontFamily:"'Libre Baskerville',serif", fontSize:11, color:stageColor, fontWeight:700 }}>{fmt$(d.value)}</span>}
+          {d.value > 0 && <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:stageColor, fontWeight:600 }}>{fmt$(d.value)}</span>}
           {ns && <span style={{ fontSize:11, color: overdue ? '#B91C1C' : 'var(--text-3)' }}>{overdue ? '⚠ ' : '🕐 '}{fmtDate(ns.reminderAt)}</span>}
           {ns?.note && <span style={{ fontSize:11, color:'var(--text-3)', fontStyle:'italic' }}>"{ns.note}"</span>}
         </div>
@@ -223,7 +223,7 @@ export default function PipelinePage() {
                       style={{ position:'absolute', left:left+'%', top:0, display:'flex', alignItems:'center', gap:5, transform: left > 72 ? 'translateX(-100%)' : 'none', whiteSpace:'nowrap', cursor:'pointer' }}>
                       <div style={{ width:6, height:6, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
                       <span style={{ fontSize:11, color:'var(--text-2)' }}>{s}</span>
-                      <span style={{ fontFamily:"'Libre Baskerville',serif", fontSize:11, color: si===stages.length-1 ? '#2D8A5E' : 'var(--text-1)', fontWeight:700 }}>{fmt$(stageTotal(si))}</span>
+                      <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color: si===stages.length-1 ? '#2D8A5E' : 'var(--text-1)', fontWeight:500 }}>{fmt$(stageTotal(si))}</span>
                       <span style={{ fontSize:10, color:'var(--text-4)' }}>({count})</span>
                     </div>
                   )
@@ -244,7 +244,7 @@ export default function PipelinePage() {
                   <div style={{ display:'flex', alignItems:'center', gap:8 }}>
                     <span style={{ width:8, height:8, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
                     <span style={{ fontSize:13, color:'var(--text-2)' }}>{s}</span>
-                    <span style={{ fontFamily:"'Libre Baskerville',serif", fontSize:13, color: isLast ? '#2D8A5E' : 'var(--text-1)', fontWeight:700 }}>{fmt$(stageTotal(si))}</span>
+                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color: isLast ? '#2D8A5E' : 'var(--text-1)', fontWeight:600 }}>{fmt$(stageTotal(si))}</span>
                     <span style={{ fontSize:11, color:'var(--text-4)' }}>({count})</span>
                   </div>
                   <div style={{ width: pct + '%', height:3, background: STAGE_COLORS[si], borderRadius:2, marginTop:5, transition:'width 0.4s ease' }} />
@@ -261,7 +261,7 @@ export default function PipelinePage() {
           {[['Active', fmt$(activeTotal), 'var(--text-1)'], ['Won', fmt$(closedTotal), '#2D8A5E'], ['Win Rate', winRate+'%', winRate > 0 ? '#2D8A5E' : 'var(--text-3)']].map(([label, val, col]) => (
             <div key={label} style={{ textAlign:'center' }}>
               <div className="summary-kpi-label" style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:5 }}>{label}</div>
-              <div className="summary-kpi-val" style={{ fontFamily:"'Libre Baskerville',serif", fontSize:14, color:col, fontWeight:700 }}>{val}</div>
+              <div className="summary-kpi-val" style={{ fontFamily:"'DM Mono',monospace", fontSize:14, color:col, fontWeight:500 }}>{val}</div>
             </div>
           ))}
         </div>
@@ -366,7 +366,7 @@ export default function PipelinePage() {
                             {d.business && <div style={{ fontSize:14, color:'var(--text-3)', marginTop:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{d.business}</div>}
                           </div>
                           <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:3, flexShrink:0 }}>
-                            {d.value > 0 && <div style={{ fontFamily:"'Libre Baskerville',serif", fontSize:13, color:dot, fontWeight:700 }}>{fmt$(d.value)}</div>}
+                            {d.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color:dot, fontWeight:600 }}>{fmt$(d.value)}</div>}
                             {dt && <span style={{ fontSize:9, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 5px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
                           </div>
                         </div>
@@ -420,7 +420,7 @@ export default function PipelinePage() {
                 </div>
                 <div style={{ display:'flex', alignItems:'center', gap:8, flexShrink:0, marginLeft:10 }}>
                   {deal.deal_type && (() => { const dt = getDealType(deal.deal_type); return dt ? <span style={{ fontSize:10, background:dt.bg, color:dt.color, borderRadius:5, padding:'2px 8px', fontWeight:600 }}>{dt.icon} {dt.label}</span> : null })()}
-                  {deal.value > 0 && <div style={{ fontFamily:"'Libre Baskerville',serif", fontSize:13, color:stageColor, fontWeight:700 }}>{fmt$(deal.value)}</div>}
+                  {deal.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color:stageColor, fontWeight:600 }}>{fmt$(deal.value)}</div>}
                   <button onClick={()=>setActiveTab('contact')} title="Edit deal" style={{ background:'none', border:'1px solid var(--border)', borderRadius:6, color:'var(--text-3)', fontSize:13, lineHeight:1, cursor:'pointer', padding:'3px 7px' }}>✏️</button>
                   <button onClick={()=>setPanelId(null)} style={{ background:'none', border:'none', color:'var(--text-3)', fontSize:20, lineHeight:1, cursor:'pointer', padding:'0 2px' }}>×</button>
                 </div>
