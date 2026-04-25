@@ -159,7 +159,7 @@ export default function PipelinePage() {
         <button className="topbar-addbtn" onClick={() => { setShowForm(true); setFormStage(0) }}
           style={{ background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:7, padding:'6px 14px', fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:5, cursor:'pointer', letterSpacing:'0.1px', marginRight:24, boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          <span className="topbar-addbtn-label">Add Lead</span>
+          <span className="topbar-addbtn-label">Add Deal</span>
         </button>
         <nav className="topbar-nav" style={{ display:'flex', alignItems:'center', gap:20 }}>
           {[['board','Pipeline'],['today','Today']].map(([v, label]) => (
@@ -329,7 +329,7 @@ export default function PipelinePage() {
                 onDragOver={e => { e.preventDefault(); setDragOver(si) }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
                 onDrop={e => { e.preventDefault(); if (dragId) upd(dragId, { stage: si }); setDragId(null); setDragOver(null) }}
-                style={{ flex:'0 0 232px', margin:'0 6px', background:'#EDE8E0', borderRadius:12, border:'1px solid #B0A898', display:'flex', flexDirection:'column', maxHeight:'100%', minHeight:260, boxShadow:'0 2px 8px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.08)' }}>
+                style={{ flex:'0 0 267px', margin:'0 6px', background:'#EDE8E0', borderRadius:12, border:'1px solid #B0A898', display:'flex', flexDirection:'column', maxHeight:'100%', minHeight:260, boxShadow:'0 2px 8px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.08)' }}>
                 <div style={{ padding:'11px 13px 9px', borderBottom:'1px solid #C8C1B4' }}>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:6 }}>
                     {editingStage === si ? (
@@ -346,7 +346,7 @@ export default function PipelinePage() {
 
                 <div className="stage-cards" style={{ flex:1, overflowY:'auto', padding:'8px 8px 0', background:'#E6E0D6' }}>
                   {stDeals.length === 0 && (
-                    <div style={{ textAlign:'center', color:'var(--text-4)', fontSize:11, marginTop:24, fontStyle:'italic' }}>No leads yet</div>
+                    <div style={{ textAlign:'center', color:'var(--text-4)', fontSize:11, marginTop:24, fontStyle:'italic' }}>No deals yet</div>
                   )}
                   {stDeals.map(d => {
                     const ns = d.next_step
@@ -587,7 +587,7 @@ export default function PipelinePage() {
       {showForm && (
         <div style={{ position:'fixed', inset:0, background:'rgba(28,25,23,0.4)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:300, backdropFilter:'blur(6px)' }}>
           <div style={{ background:'var(--white)', border:'1px solid var(--border)', borderRadius:16, padding:'28px 28px 24px', width:400, boxShadow:'var(--shadow-lg)' }}>
-            <div style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:19, marginBottom:20, color:'var(--text-1)', letterSpacing:'-0.3px' }}>New Lead</div>
+            <div style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:19, marginBottom:20, color:'var(--text-1)', letterSpacing:'-0.3px' }}>New Deal</div>
             {formError && (
               <div style={{ fontSize:12, color:'#B91C1C', background:'#FEE2E2', border:'1px solid #FECACA', borderRadius:7, padding:'8px 12px', marginBottom:14 }}>{formError}</div>
             )}
@@ -644,7 +644,7 @@ export default function PipelinePage() {
               </div>
             </div>
             <div style={{ display:'flex', gap:8, marginTop:22 }}>
-              <button onClick={handleAddDeal} style={{ flex:1, background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:8, padding:'11px', fontSize:13, fontWeight:600, cursor:'pointer', letterSpacing:'0.1px', boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>Add Lead</button>
+              <button onClick={handleAddDeal} style={{ flex:1, background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:8, padding:'11px', fontSize:13, fontWeight:600, cursor:'pointer', letterSpacing:'0.1px', boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>Add Deal</button>
               <button onClick={()=>setShowForm(false)} style={{ padding:'11px 16px', background:'var(--cream)', color:'var(--text-2)', border:'1px solid var(--border)', borderRadius:8, fontSize:13, cursor:'pointer' }}>Cancel</button>
             </div>
           </div>
