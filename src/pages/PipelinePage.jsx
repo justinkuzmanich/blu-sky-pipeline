@@ -155,7 +155,7 @@ export default function PipelinePage() {
     <div style={{ height:'100vh', background:'var(--cream)', color:'var(--text-1)', fontFamily:"'DM Sans',sans-serif", display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
       {/* ── TOP BAR ── */}
-      <div className="topbar" style={{ background:'var(--white)', borderBottom:'1px solid var(--topbar-border)', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="topbar" style={{ background:'var(--white)', borderBottom:'1px solid var(--topbar-border)', padding:'0 24px 0 12px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
         <span className="topbar-title" style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:17, color:'var(--text-1)', letterSpacing:'-0.3px', marginRight:20 }}>Blu Sky Pipeline</span>
         <button className="topbar-addbtn" onClick={() => { setShowForm(true); setFormStage(0) }}
           style={{ background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:7, padding:'6px 14px', fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:5, cursor:'pointer', letterSpacing:'0.1px', marginRight:24, boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>
