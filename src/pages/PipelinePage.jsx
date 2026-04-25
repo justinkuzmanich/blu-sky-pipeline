@@ -88,8 +88,39 @@ export default function PipelinePage() {
 
   const nameRef = useRef(null)
   const noteRef = useRef(null)
+  const boardRef = useRef(null)
 
   useEffect(() => { if (showForm) setTimeout(() => nameRef.current?.focus(), 50) }, [showForm])
+
+  useEffect(() => {
+    if (view !== 'board') return
+    const board = boardRef.current
+    if (!board) return
+    if (typeof window === 'undefined') return
+    if (!window.matchMedia('(pointer: fine)').matches) return
+
+    const onWheel = (e) => {
+      if (e.shiftKey) return
+      if (e.deltaX !== 0) return
+      if (e.deltaY === 0) return
+
+      let el = e.target
+      while (el && el !== board && el.nodeType === 1) {
+        const cs = window.getComputedStyle(el)
+        const oy = cs.overflowY
+        if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) {
+          return
+        }
+        el = el.parentNode
+      }
+
+      e.preventDefault()
+      board.scrollLeft += e.deltaY
+    }
+
+    board.addEventListener('wheel', onWheel, { passive: false })
+    return () => board.removeEventListener('wheel', onWheel)
+  }, [view])
 
   const deal = deals.find(d => d.id === panelId) || null
   const stageColor = deal ? (STAGE_COLORS[deal.stage] || STAGE_COLORS[0]) : STAGE_COLORS[0]
@@ -318,7 +349,7 @@ export default function PipelinePage() {
         )}
 
         {view === 'board' && (
-        <div className="board" style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', scrollPadding:'0 14px', alignItems:'flex-start', background:'var(--board-bg)' }}>
+        <div ref={boardRef} className="board" style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', scrollPadding:'0 14px', alignItems:'flex-start', background:'var(--board-bg)' }}>
           {stages.map((stage, si) => {
             const dot   = STAGE_COLORS[si] || STAGE_COLORS[0]
             const sbg   = STAGE_BG[si]     || STAGE_BG[0]
