@@ -275,7 +275,7 @@ export default function PipelinePage() {
         )}
 
         {view === 'board' && (
-        <div style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', alignItems:'flex-start', background:'#BDB4A6' }}>
+        <div className="board" style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', alignItems:'flex-start', background:'#BDB4A6' }}>
           {stages.map((stage, si) => {
             const dot   = STAGE_COLORS[si] || STAGE_COLORS[0]
             const sbg   = STAGE_BG[si]     || STAGE_BG[0]
@@ -283,7 +283,7 @@ export default function PipelinePage() {
             const isLast  = si === stages.length - 1
             return (
               <div key={si}
-                className={`drop-zone${dragOver === si ? ' drag-over' : ''}`}
+                className={`drop-zone stage-col${dragOver === si ? ' drag-over' : ''}`}
                 onDragOver={e => { e.preventDefault(); setDragOver(si) }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
                 onDrop={e => { e.preventDefault(); if (dragId) upd(dragId, { stage: si }); setDragId(null); setDragOver(null) }}
@@ -304,7 +304,7 @@ export default function PipelinePage() {
                   )}
                 </div>
 
-                <div style={{ flex:1, overflowY:'auto', padding:'8px 8px 0', background:'#E6E0D6' }}>
+                <div className="stage-cards" style={{ flex:1, overflowY:'auto', padding:'8px 8px 0', background:'#E6E0D6' }}>
                   {stDeals.length === 0 && (
                     <div style={{ textAlign:'center', color:'var(--text-4)', fontSize:11, marginTop:24, fontStyle:'italic' }}>No leads yet</div>
                   )}

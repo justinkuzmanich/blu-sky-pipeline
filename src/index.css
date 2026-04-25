@@ -86,11 +86,29 @@ textarea { resize: none; }
   }
 }
 
-/* Mobile board — bigger tap targets */
+/* Mobile board — stack columns vertically, bigger tap targets */
 @media (max-width: 640px) {
   .move-btn, .note-del    { opacity: 1 !important; }
   .deal-card              { padding: 13px 14px !important; }
   .stage-pill-btn         { padding: 5px 12px !important; font-size: 12px !important; }
+  .board {
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 10px !important;
+    align-items: stretch !important;
+  }
+  .stage-col {
+    flex: none !important;
+    width: 100% !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    margin: 0 0 10px 0 !important;
+  }
+  .stage-cards {
+    overflow-y: visible !important;
+    max-height: none !important;
+  }
 }
 
 /* Auth pages */
