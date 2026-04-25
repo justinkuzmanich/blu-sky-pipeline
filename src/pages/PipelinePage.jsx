@@ -186,31 +186,58 @@ export default function PipelinePage() {
 
         <div className="summary-stages" style={{ flex:1, minWidth:0 }}>
           <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:8 }}>By Stage</div>
-          <div style={{ display:'flex', height:4, borderRadius:4, overflow:'hidden', background:'var(--cream-dark)', marginBottom:10 }}>
-            {stages.map((_, si) => {
-              const pct = grandTotal > 0 ? (stageTotal(si) / grandTotal) * 100 : 0
-              return pct > 0 ? <div key={si} style={{ width:pct+'%', background:STAGE_COLORS[si], transition:'width 0.4s ease' }} /> : null
-            })}
-          </div>
-          <div style={{ position:'relative', height:22 }}>
-            {(() => {
-              let cumPct = 0
-              return stages.map((s, si) => {
+
+          {/* Desktop: horizontal progress bar with inline labels */}
+          <div className="summary-stages-desktop">
+            <div style={{ display:'flex', height:4, borderRadius:4, overflow:'hidden', background:'var(--cream-dark)', marginBottom:10 }}>
+              {stages.map((_, si) => {
                 const pct = grandTotal > 0 ? (stageTotal(si) / grandTotal) * 100 : 0
-                const count = deals.filter(d => d.stage === si).length
-                const left = cumPct
-                cumPct += pct
-                if (!count || pct === 0) return null
-                return (
-                  <div key={si} style={{ position:'absolute', left:left+'%', top:0, display:'flex', alignItems:'center', gap:5, transform: left > 72 ? 'translateX(-100%)' : 'none', whiteSpace:'nowrap' }}>
-                    <div style={{ width:6, height:6, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
-                    <span style={{ fontSize:11, color:'var(--text-2)' }}>{s}</span>
-                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color: si===stages.length-1 ? '#2D8A5E' : 'var(--text-1)', fontWeight:500 }}>{fmt$(stageTotal(si))}</span>
-                    <span style={{ fontSize:10, color:'var(--text-4)' }}>({count})</span>
+                return pct > 0 ? <div key={si} style={{ width:pct+'%', background:STAGE_COLORS[si], transition:'width 0.4s ease' }} /> : null
+              })}
+            </div>
+            <div style={{ position:'relative', height:22 }}>
+              {(() => {
+                let cumPct = 0
+                return stages.map((s, si) => {
+                  const pct = grandTotal > 0 ? (stageTotal(si) / grandTotal) * 100 : 0
+                  const count = deals.filter(d => d.stage === si).length
+                  const left = cumPct
+                  cumPct += pct
+                  if (!count || pct === 0) return null
+                  return (
+                    <div key={si} style={{ position:'absolute', left:left+'%', top:0, display:'flex', alignItems:'center', gap:5, transform: left > 72 ? 'translateX(-100%)' : 'none', whiteSpace:'nowrap' }}>
+                      <div style={{ width:6, height:6, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
+                      <span style={{ fontSize:11, color:'var(--text-2)' }}>{s}</span>
+                      <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color: si===stages.length-1 ? '#2D8A5E' : 'var(--text-1)', fontWeight:500 }}>{fmt$(stageTotal(si))}</span>
+                      <span style={{ fontSize:10, color:'var(--text-4)' }}>({count})</span>
+                    </div>
+                  )
+                })
+              })()}
+            </div>
+          </div>
+
+          {/* Mobile: stacked list per stage with a proportional bar */}
+          <div className="summary-stages-mobile">
+            {stages.map((s, si) => {
+              const count = deals.filter(d => d.stage === si).length
+              if (!count) return null
+              const pct = grandTotal > 0 ? (stageTotal(si) / grandTotal) * 100 : 0
+              const isLast = si === stages.length - 1
+              return (
+                <div key={si} style={{ marginBottom: 10 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <span style={{ width:8, height:8, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
+                    <span style={{ fontSize:13, color:'var(--text-2)' }}>{s}</span>
+                    <span style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color: isLast ? '#2D8A5E' : 'var(--text-1)', fontWeight:600 }}>{fmt$(stageTotal(si))}</span>
+                    <span style={{ fontSize:11, color:'var(--text-4)' }}>({count})</span>
                   </div>
-                )
-              })
-            })()}
+                  <div style={{ height:3, background:'var(--cream-dark)', borderRadius:2, marginTop:5, overflow:'hidden' }}>
+                    <div style={{ width: pct + '%', height:'100%', background: STAGE_COLORS[si], transition:'width 0.4s ease' }} />
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
 

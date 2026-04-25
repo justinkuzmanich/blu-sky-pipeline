@@ -63,16 +63,28 @@ textarea { resize: none; }
   .topbar-title           { display: none !important; }
 }
 
+/* Desktop hides mobile-only stage list; mobile hides desktop bar+labels */
+.summary-stages-mobile    { display: none; }
+
 /* Mobile summary bar */
 @media (max-width: 640px) {
-  .summary-bar            { padding: 12px 14px !important; }
-  .summary-total          { min-width: 0 !important; padding-right: 14px !important; }
+  .summary-bar            { flex-wrap: wrap !important; padding: 12px 14px !important; }
+  .summary-total          { order: 1; min-width: 0 !important; padding-right: 14px !important; }
   .summary-total-val      { font-size: 20px !important; }
-  .summary-stages         { display: none !important; }
-  .summary-divider        { display: none !important; }
-  .summary-kpis           { gap: 18px !important; margin-left: auto !important; }
+  .summary-kpis           { order: 2; margin-left: auto !important; gap: 18px !important; }
   .summary-kpi-val        { font-size: 12px !important; }
   .summary-kpi-label      { font-size: 9px !important; }
+  .summary-divider        { display: none !important; }
+  .summary-stages {
+    order: 3 !important;
+    flex: 0 0 100% !important;
+    width: 100% !important;
+    margin-top: 12px !important;
+    padding-top: 12px !important;
+    border-top: 1px solid var(--border-light);
+  }
+  .summary-stages-desktop { display: none !important; }
+  .summary-stages-mobile  { display: block !important; }
 }
 
 /* Mobile side panel — full-screen overlay */
