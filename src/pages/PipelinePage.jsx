@@ -247,9 +247,7 @@ export default function PipelinePage() {
                     <span style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color: isLast ? '#2D8A5E' : 'var(--text-1)', fontWeight:600 }}>{fmt$(stageTotal(si))}</span>
                     <span style={{ fontSize:11, color:'var(--text-4)' }}>({count})</span>
                   </div>
-                  <div style={{ height:3, background:'var(--cream-dark)', borderRadius:2, marginTop:5, overflow:'hidden' }}>
-                    <div style={{ width: pct + '%', height:'100%', background: STAGE_COLORS[si], transition:'width 0.4s ease' }} />
-                  </div>
+                  <div style={{ width: pct + '%', height:3, background: STAGE_COLORS[si], borderRadius:2, marginTop:5, transition:'width 0.4s ease' }} />
                 </div>
               )
             })}
