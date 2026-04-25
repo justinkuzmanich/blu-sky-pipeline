@@ -339,9 +339,9 @@ export default function PipelinePage() {
                       <div onClick={()=>startEditStage(si)} title="Click to rename"
                         style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:15, color:'var(--text-1)', cursor:'text', flex:1, userSelect:'none' }}>{stage}</div>
                     )}
-                    <span style={{ background:sbg, color:dot, border:`1px solid ${dot}33`, borderRadius:20, padding:'1px 8px', fontSize:10, fontWeight:700, flexShrink:0 }}>{stDeals.length}</span>
+                    <span style={{ background:sbg, color:dot, border:`1px solid ${dot}33`, borderRadius:20, padding:'1px 8px', fontSize:12, fontWeight:700, flexShrink:0 }}>{stDeals.length}</span>
                   </div>
-                  <div style={{ fontSize:11, fontFamily:"'DM Mono',monospace", color: stDeals.length > 0 && isLast ? '#2D8A5E' : 'var(--text-2)', marginTop:4, fontWeight:500 }}>{fmt$(stageTotal(si))}</div>
+                  <div style={{ fontSize:13, fontFamily:"'DM Mono',monospace", color: stDeals.length > 0 && isLast ? '#2D8A5E' : 'var(--text-2)', marginTop:4, fontWeight:500, visibility: stDeals.length > 0 ? 'visible' : 'hidden' }}>{fmt$(stageTotal(si))}</div>
                 </div>
 
                 <div className="stage-cards" style={{ flex:1, overflowY:'auto', padding:'8px 8px 0', background:'#E6E0D6' }}>
@@ -366,7 +366,7 @@ export default function PipelinePage() {
                             {d.business && <div style={{ fontSize:14, color:'var(--text-3)', marginTop:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{d.business}</div>}
                           </div>
                           <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:3, flexShrink:0 }}>
-                            {d.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color:dot, fontWeight:600 }}>{fmt$(d.value)}</div>}
+                            {d.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color:dot, fontWeight:600 }}>{fmt$(d.value)}</div>}
                             {dt && <span style={{ fontSize:9, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 5px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
                           </div>
                         </div>
@@ -383,7 +383,7 @@ export default function PipelinePage() {
                         <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginTop:8 }}>
                           <div>
                             {(d.notes||[]).length > 0 && (
-                              <span style={{ fontSize:9, color:'var(--text-3)', background:'var(--cream)', borderRadius:4, padding:'1px 6px', border:'1px solid var(--border-light)' }}>📝 {d.notes.length}</span>
+                              <span style={{ fontSize:11, color:'var(--text-3)', background:'var(--cream)', borderRadius:4, padding:'1px 6px', border:'1px solid var(--border-light)' }}>📝 {d.notes.length}</span>
                             )}
                           </div>
                           <div style={{ display:'flex', gap:1 }} onClick={e=>e.stopPropagation()}>
