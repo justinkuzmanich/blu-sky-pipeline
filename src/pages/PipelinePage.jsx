@@ -331,7 +331,7 @@ export default function PipelinePage() {
                 onDragOver={e => { e.preventDefault(); setDragOver(si) }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
                 onDrop={e => { e.preventDefault(); if (dragId) upd(dragId, { stage: si }); setDragId(null); setDragOver(null) }}
-                style={{ flex:'0 0 267px', margin:'0 6px', background:'var(--col-bg)', borderRadius:12, border:'1px solid var(--col-border)', display:'flex', flexDirection:'column', maxHeight:'100%', minHeight:260, boxShadow:'0 2px 8px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.08)' }}>
+                style={{ flex:'0 0 320px', margin:'0 6px', background:'var(--col-bg)', borderRadius:12, border:'1px solid var(--col-border)', display:'flex', flexDirection:'column', maxHeight:'100%', minHeight:260, boxShadow:'0 2px 8px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.08)' }}>
                 <div style={{ padding:'11px 13px 9px', borderBottom:'1px solid var(--col-divider)' }}>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:6 }}>
                     {editingStage === si ? (
