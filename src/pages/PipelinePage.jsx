@@ -155,7 +155,7 @@ export default function PipelinePage() {
     <div style={{ height:'100vh', background:'var(--cream)', color:'var(--text-1)', fontFamily:"'DM Sans',sans-serif", display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
       {/* ── TOP BAR ── */}
-      <div className="topbar" style={{ background:'#FFFFFF', borderBottom:'1px solid #E8E2D9', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="topbar" style={{ background:'var(--white)', borderBottom:'1px solid var(--topbar-border)', padding:'0 24px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
         <span className="topbar-title" style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:17, color:'var(--text-1)', letterSpacing:'-0.3px', marginRight:20 }}>Blu Sky Pipeline</span>
         <button className="topbar-addbtn" onClick={() => { setShowForm(true); setFormStage(0) }}
           style={{ background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:7, padding:'6px 14px', fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:5, cursor:'pointer', letterSpacing:'0.1px', marginRight:24, boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>
@@ -318,7 +318,7 @@ export default function PipelinePage() {
         )}
 
         {view === 'board' && (
-        <div className="board" style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', alignItems:'flex-start', background:'#BDB4A6' }}>
+        <div className="board" style={{ flex:1, display:'flex', overflowX:'auto', overflowY:'hidden', padding:'18px 14px', alignItems:'flex-start', background:'var(--board-bg)' }}>
           {stages.map((stage, si) => {
             const dot   = STAGE_COLORS[si] || STAGE_COLORS[0]
             const sbg   = STAGE_BG[si]     || STAGE_BG[0]
@@ -331,8 +331,8 @@ export default function PipelinePage() {
                 onDragOver={e => { e.preventDefault(); setDragOver(si) }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
                 onDrop={e => { e.preventDefault(); if (dragId) upd(dragId, { stage: si }); setDragId(null); setDragOver(null) }}
-                style={{ flex:'0 0 267px', margin:'0 6px', background:'#EDE8E0', borderRadius:12, border:'1px solid #B0A898', display:'flex', flexDirection:'column', maxHeight:'100%', minHeight:260, boxShadow:'0 2px 8px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.08)' }}>
-                <div style={{ padding:'11px 13px 9px', borderBottom:'1px solid #C8C1B4' }}>
+                style={{ flex:'0 0 267px', margin:'0 6px', background:'var(--col-bg)', borderRadius:12, border:'1px solid var(--col-border)', display:'flex', flexDirection:'column', maxHeight:'100%', minHeight:260, boxShadow:'0 2px 8px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.08)' }}>
+                <div style={{ padding:'11px 13px 9px', borderBottom:'1px solid var(--col-divider)' }}>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:6 }}>
                     {editingStage === si ? (
                       <input autoFocus value={stageInput} onChange={e=>setStageInput(e.target.value)} onBlur={saveStage} onKeyDown={e=>e.key==='Enter'&&saveStage()}
@@ -346,7 +346,7 @@ export default function PipelinePage() {
                   <div style={{ fontSize:16, fontFamily:"'Libre Baskerville',serif", color:'var(--text-1)', marginTop:4, fontWeight:700, letterSpacing:'-0.2px', visibility: stDeals.length > 0 ? 'visible' : 'hidden' }}>{fmt$(stageTotal(si))}</div>
                 </div>
 
-                <div className="stage-cards" style={{ flex:1, overflowY:'auto', padding:'8px 8px 0', background:'#E6E0D6' }}>
+                <div className="stage-cards" style={{ flex:1, overflowY:'auto', padding:'8px 8px 0', background:'var(--col-body-bg)' }}>
                   {stDeals.length === 0 && (
                     <div style={{ textAlign:'center', color:'var(--text-4)', fontSize:11, marginTop:24, fontStyle:'italic' }}>No deals yet</div>
                   )}
@@ -361,7 +361,7 @@ export default function PipelinePage() {
                         onDragStart={e => { setDragId(d.id); e.dataTransfer.effectAllowed = 'move' }}
                         onDragEnd={() => { setDragId(null); setDragOver(null) }}
                         onClick={()=>openPanel(d.id)}
-                        style={{ background:'#FFFFFF', border:`1px solid ${panelId===d.id ? dot : '#D4CDC3'}`, borderRadius:9, padding:'11px 12px', marginBottom:6, cursor:'grab', opacity: dragId===d.id ? 0.45 : 1, transition:'opacity 0.15s' }}>
+                        style={{ background:'var(--card-bg)', border:`1px solid ${panelId===d.id ? dot : 'var(--card-border)'}`, borderRadius:9, padding:'11px 12px', marginBottom:6, cursor:'grab', opacity: dragId===d.id ? 0.45 : 1, transition:'opacity 0.15s' }}>
                         <div style={{ display:'flex', justifyContent:'space-between', gap:6, alignItems:'flex-start' }}>
                           <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ fontWeight:600, fontSize:15.5, color:'var(--text-1)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{d.name}</div>
@@ -398,9 +398,9 @@ export default function PipelinePage() {
                   })}
                 </div>
 
-                <div style={{ padding:'6px 8px 9px', flexShrink:0, background:'#E6E0D6', borderRadius:'0 0 12px 12px' }}>
+                <div style={{ padding:'6px 8px 9px', flexShrink:0, background:'var(--col-body-bg)', borderRadius:'0 0 12px 12px' }}>
                   <button className="add-here" onClick={()=>{ setFormStage(si); setShowForm(true) }}
-                    style={{ width:'100%', background:'transparent', border:'1px dashed #7A6F62', borderRadius:7, color:'#6B6057', padding:'6px', fontSize:11, display:'flex', alignItems:'center', justifyContent:'center', gap:4, cursor:'pointer' }}>
+                    style={{ width:'100%', background:'transparent', border:'1px dashed var(--add-here-border)', borderRadius:7, color:'var(--add-here-text)', padding:'6px', fontSize:11, display:'flex', alignItems:'center', justifyContent:'center', gap:4, cursor:'pointer' }}>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     Add deal
                   </button>
