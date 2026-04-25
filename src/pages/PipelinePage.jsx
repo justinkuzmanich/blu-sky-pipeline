@@ -341,9 +341,7 @@ export default function PipelinePage() {
                     )}
                     <span style={{ background:sbg, color:dot, border:`1px solid ${dot}33`, borderRadius:20, padding:'1px 8px', fontSize:10, fontWeight:700, flexShrink:0 }}>{stDeals.length}</span>
                   </div>
-                  {stDeals.length > 0 && (
-                    <div style={{ fontSize:11, fontFamily:"'DM Mono',monospace", color: isLast ? '#2D8A5E' : 'var(--text-2)', marginTop:4, fontWeight:500 }}>{fmt$(stageTotal(si))}</div>
-                  )}
+                  <div style={{ fontSize:11, fontFamily:"'DM Mono',monospace", color: stDeals.length > 0 && isLast ? '#2D8A5E' : 'var(--text-2)', marginTop:4, fontWeight:500 }}>{fmt$(stageTotal(si))}</div>
                 </div>
 
                 <div className="stage-cards" style={{ flex:1, overflowY:'auto', padding:'8px 8px 0', background:'#E6E0D6' }}>
