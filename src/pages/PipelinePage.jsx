@@ -241,7 +241,7 @@ export default function PipelinePage() {
                   if (!count || pct === 0) return null
                   return (
                     <div key={si} onClick={() => scrollToStage(si)}
-                      style={{ position:'absolute', left:left+'%', top:0, display:'flex', alignItems:'center', gap:5, transform: left > 72 ? 'translateX(-100%)' : 'none', whiteSpace:'nowrap', cursor:'pointer' }}>
+                      style={{ position:'absolute', left:left+'%', top:0, display:'flex', alignItems:'center', gap:5, transform: left > 72 && si < stages.length - 1 ? 'translateX(-100%)' : 'none', whiteSpace:'nowrap', cursor:'pointer' }}>
                       <div style={{ width:6, height:6, borderRadius:'50%', background:STAGE_COLORS[si], flexShrink:0 }} />
                       <span style={{ fontSize:11, color:'var(--text-2)' }}>{s}</span>
                       <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color: si===stages.length-1 ? '#2D8A5E' : 'var(--text-1)', fontWeight:500 }}>{fmt$(stageTotal(si))}</span>
