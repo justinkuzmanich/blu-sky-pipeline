@@ -94,20 +94,19 @@ export default function PipelinePage() {
 
   useEffect(() => {
     if (view !== 'board') return
-    const board = boardRef.current
-    if (!board) return
-    if (typeof window === 'undefined') return
     if (!window.matchMedia('(pointer: fine)').matches) return
 
     const onWheel = (e) => {
+      const board = boardRef.current
+      if (!board || !board.contains(e.target)) return
       if (e.deltaX !== 0) return
       if (e.deltaY === 0) return
       e.preventDefault()
       board.scrollLeft += e.deltaY
     }
 
-    board.addEventListener('wheel', onWheel, { passive: false })
-    return () => board.removeEventListener('wheel', onWheel)
+    window.addEventListener('wheel', onWheel, { passive: false })
+    return () => window.removeEventListener('wheel', onWheel)
   }, [view])
 
   const deal = deals.find(d => d.id === panelId) || null
