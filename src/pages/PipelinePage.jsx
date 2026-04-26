@@ -100,20 +100,8 @@ export default function PipelinePage() {
     if (!window.matchMedia('(pointer: fine)').matches) return
 
     const onWheel = (e) => {
-      if (e.shiftKey) return
       if (e.deltaX !== 0) return
       if (e.deltaY === 0) return
-
-      let el = e.target
-      while (el && el !== board && el.nodeType === 1) {
-        const cs = window.getComputedStyle(el)
-        const oy = cs.overflowY
-        if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight) {
-          return
-        }
-        el = el.parentNode
-      }
-
       e.preventDefault()
       board.scrollLeft += e.deltaY
     }
