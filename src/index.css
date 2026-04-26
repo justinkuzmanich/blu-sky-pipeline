@@ -73,7 +73,8 @@ input, textarea, button { outline: none; font-family: inherit; }
 textarea { resize: none; }
 
 /* Pipeline board */
-.deal-card { transition: transform 0.15s ease; }
+.board { touch-action: pan-x; }
+.deal-card { transition: transform 0.15s ease; touch-action: pan-x pan-y; }
 .deal-card:hover { transform: translateY(-2px); }
 .move-btn { opacity: 0; transition: opacity 0.12s; }
 .deal-card:hover .move-btn { opacity: 1; }
