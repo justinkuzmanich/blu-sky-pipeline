@@ -97,7 +97,8 @@ textarea { resize: none; }
 /* Mobile top bar overrides */
 @media (max-width: 640px) {
   .topbar                 { padding: 0 12px 0 0 !important; }
-  .topbar-title           { font-size: 14px !important; margin-right: 0 !important; letter-spacing: -0.2px !important; margin-left: -5px !important; }
+  .topbar-title           { font-size: 14px !important; margin-right: 0 !important; letter-spacing: -0.2px !important; margin-left: -5px !important; line-height: 1.1 !important; }
+  .topbar-title-line      { display: block; }
   .topbar-addbtn          { margin-right: 10px !important; padding: 6px 9px !important; }
   .topbar-addbtn-label    { display: none !important; }
   .topbar-nav             { gap: 12px !important; }
