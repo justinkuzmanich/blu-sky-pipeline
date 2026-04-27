@@ -562,9 +562,12 @@ export default function PipelinePage() {
           </div>
         )}
 
-        {/* ── SIDE PANEL ── */}
-        {deal && (
-          <div className="deal-panel" style={{ width:376, flexShrink:0, background:'var(--white)', borderLeft:'1px solid var(--border-light)', display:'flex', flexDirection:'column', overflow:'hidden', boxShadow:'-4px 0 16px rgba(0,0,0,0.04)' }}>
+      </div>
+
+      {/* ── DEAL MODAL ── */}
+      {deal && (
+        <div style={{ position:'fixed', inset:0, background:'rgba(28,25,23,0.45)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:200, backdropFilter:'blur(4px)' }} onClick={()=>setPanelId(null)}>
+          <div style={{ width:'100%', maxWidth:560, maxHeight:'90vh', background:'var(--white)', borderRadius:16, display:'flex', flexDirection:'column', overflow:'hidden', boxShadow:'var(--shadow-lg)', margin:'0 24px' }} onClick={e=>e.stopPropagation()}>
             <div style={{ padding:'16px 18px 12px', borderBottom:'1px solid var(--border-light)', flexShrink:0 }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
                 <div style={{ flex:1, minWidth:0 }}>
@@ -733,8 +736,8 @@ export default function PipelinePage() {
               )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* ── ADD LEAD MODAL ── */}
       {showForm && (
