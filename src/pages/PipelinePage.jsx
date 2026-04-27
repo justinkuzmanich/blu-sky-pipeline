@@ -146,6 +146,10 @@ export default function PipelinePage() {
     return () => document.removeEventListener('click', close)
   }, [statusMenuId])
 
+  useEffect(() => {
+    if (panelId && window.innerWidth <= 640) setStagesOpen(false)
+  }, [panelId])
+
   const deal = deals.find(d => d.id === panelId) || null
   const stageColor = deal ? (STAGE_COLORS[deal.stage] || STAGE_COLORS[0]) : STAGE_COLORS[0]
 
