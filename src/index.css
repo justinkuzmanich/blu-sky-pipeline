@@ -133,14 +133,14 @@ textarea { resize: none; }
   .summary-stages-mobile  { display: block !important; }
 }
 
-/* Mobile side panel — full-screen overlay */
+/* Mobile deal modal — top-aligned to stage cards area */
 @media (max-width: 640px) {
-  .deal-panel {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100% !important;
-    z-index: 200 !important;
-    border-left: none !important;
+  .deal-modal-overlay { align-items: flex-start !important; }
+  .deal-modal-box {
+    margin: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 12px 12px 0 0 !important;
   }
 }
 
