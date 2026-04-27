@@ -223,7 +223,7 @@ export default function PipelinePage() {
     <div style={{ height:'100vh', background:'var(--cream)', color:'var(--text-1)', fontFamily:"'DM Sans',sans-serif", display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
       {/* ── TOP BAR ── */}
-      <div className="topbar" style={{ background:'var(--white)', borderBottom:'1px solid var(--topbar-border)', padding:'0 24px 0 12px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="topbar" style={{ background:'var(--white)', borderBottom:'1px solid var(--topbar-border)', padding:'0 24px 0 12px', display:'flex', alignItems:'center', justifyContent:'flex-start', height:52, flexShrink:0, boxShadow:'0 1px 3px rgba(0,0,0,0.06)', position:'relative', zIndex:300 }}>
         <span className="topbar-title" style={{ fontFamily:"'Libre Baskerville',serif", fontWeight:700, fontSize:17, color:'var(--text-1)', letterSpacing:'-0.3px', marginRight:20, paddingLeft:10, marginLeft:-15 }}>Blu Sky Pipeline</span>
         <button className="topbar-addbtn" onClick={() => { setShowForm(true); setFormStage(0) }}
           style={{ background:'#C96A1F', color:'#FFFFFF', border:'none', borderRadius:7, padding:'6px 14px', fontSize:13, fontWeight:600, display:'flex', alignItems:'center', gap:5, cursor:'pointer', letterSpacing:'0.1px', marginRight:24, boxShadow:'0 1px 4px rgba(201,106,31,0.35)' }}>
@@ -257,7 +257,7 @@ export default function PipelinePage() {
       </div>
 
       {/* ── SUMMARY BAR ── */}
-      <div className="summary-bar" style={{ background:'var(--white)', borderBottom:'1px solid var(--border-light)', padding:'14px 24px', display:'flex', alignItems:'center', gap:0, flexShrink:0 }}>
+      <div className="summary-bar" style={{ background:'var(--white)', borderBottom:'1px solid var(--border-light)', padding:'14px 24px', display:'flex', alignItems:'center', gap:0, flexShrink:0, position:'relative', zIndex:300 }}>
         <div className="summary-total" style={{ paddingRight:14, flexShrink:0 }}>
           <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:3 }}>Total Pipeline</div>
           <div className="summary-total-val" style={{ fontFamily:"'Libre Baskerville',serif", fontSize:24, fontWeight:700, color:'var(--text-1)', letterSpacing:'-0.5px', lineHeight:1 }}>{fmt$(grandTotal)}</div>
