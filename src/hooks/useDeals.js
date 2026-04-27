@@ -34,7 +34,13 @@ export function useDeals(userId) {
       .select('stages')
       .eq('user_id', userId)
       .single()
-    if (data?.stages) setStages(data.stages)
+    if (data?.stages) {
+      const migrated = data.stages.map(s => s === 'Negotiation' ? 'Invoiced' : s)
+      if (migrated.some((s, i) => s !== data.stages[i])) {
+        await supabase.from('pipeline_config').upsert({ user_id: userId, stages: migrated, updated_at: new Date().toISOString() })
+      }
+      setStages(migrated)
+    }
   }
 
   // ── Save stage names ─────────────────────────────────────────
