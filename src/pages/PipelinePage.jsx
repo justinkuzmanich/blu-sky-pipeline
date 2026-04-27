@@ -57,27 +57,57 @@ function TodayCard({ d, stages, onOpen, onClear, overdue, noStep }) {
   )
 }
 
+function ClosedDealRow({ d, stages, onReactivate, type }) {
+  const dt = getDealType(d.deal_type)
+  const stageName  = stages[d.stage] || ''
+  const stageColor = STAGE_COLORS[d.stage] || STAGE_COLORS[0]
+  const stageBg    = STAGE_BG[d.stage]     || STAGE_BG[0]
+  return (
+    <div style={{ background:'var(--white)', border:`1px solid ${type==='won' ? '#BBF7D0' : '#FECACA'}`, borderRadius:10, padding:'13px 16px', marginBottom:8, display:'flex', alignItems:'center', gap:14, boxShadow:'var(--shadow-sm)' }}>
+      <div style={{ width:36, height:36, borderRadius:8, background: type==='won' ? '#DCFCE7' : '#FEE2E2', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, flexShrink:0, color: type==='won' ? '#15803D' : '#B91C1C', fontWeight:700 }}>
+        {type === 'won' ? '✓' : '✗'}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
+          <span style={{ fontWeight:600, fontSize:14, color:'var(--text-1)' }}>{d.name}</span>
+          {d.business && <span style={{ fontSize:12, color:'var(--text-3)' }}>{d.business}</span>}
+        </div>
+        <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+          <span style={{ fontSize:11, background:stageBg, color:stageColor, border:`1px solid ${stageColor}33`, borderRadius:20, padding:'1px 7px', fontWeight:600 }}>{stageName}</span>
+          {dt && <span style={{ fontSize:12, background:dt.bg, color:dt.color, borderRadius:4, padding:'1px 6px', fontWeight:600 }}>{dt.icon} {dt.label}</span>}
+          {d.value > 0 && <span style={{ fontFamily:"'DM Mono',monospace", fontSize:11, color: type==='won' ? '#2D8A5E' : '#B91C1C', fontWeight:600 }}>{fmt$(d.value)}</span>}
+        </div>
+      </div>
+      <button onClick={onReactivate}
+        style={{ padding:'5px 12px', background:'var(--cream)', border:'1px solid var(--border)', borderRadius:6, fontSize:12, color:'var(--text-2)', fontWeight:500, cursor:'pointer', flexShrink:0 }}>
+        Reactivate
+      </button>
+    </div>
+  )
+}
+
 export default function PipelinePage() {
   const { user, profile, signOut } = useAuth()
   const { deals, stages, loaded, addDeal, updateDeal, deleteDeal, moveDeal, addNote, deleteNote, saveStages } = useDeals(user?.id)
 
   const upd = updateDeal
 
-  const [showForm, setShowForm]       = useState(false)
+  const [showForm, setShowForm]         = useState(false)
   const [editingStage, setEditingStage] = useState(null)
-  const [stageInput, setStageInput]   = useState('')
-  const [panelId, setPanelId]         = useState(null)
-  const [activeTab, setActiveTab]     = useState('notes')
-  const [form, setForm]               = useState({ name:'', business:'', phone:'', email:'', value:'' })
-  const [formStage, setFormStage]     = useState(0)
-  const [formType, setFormType]       = useState('')
-  const [newNote, setNewNote]         = useState('')
-  const [nsDraft, setNsDraft]         = useState(null)
-  const [dragId, setDragId]           = useState(null)
-  const [dragOver, setDragOver]       = useState(null)
-  const [view, setView]               = useState('board')
-  const [formError, setFormError]     = useState('')
-  const [stagesOpen, setStagesOpen]   = useState(true)
+  const [stageInput, setStageInput]     = useState('')
+  const [panelId, setPanelId]           = useState(null)
+  const [activeTab, setActiveTab]       = useState('notes')
+  const [form, setForm]                 = useState({ name:'', business:'', phone:'', email:'', value:'' })
+  const [formStage, setFormStage]       = useState(0)
+  const [formType, setFormType]         = useState('')
+  const [newNote, setNewNote]           = useState('')
+  const [nsDraft, setNsDraft]           = useState(null)
+  const [dragId, setDragId]             = useState(null)
+  const [dragOver, setDragOver]         = useState(null)
+  const [view, setView]                 = useState('board')
+  const [formError, setFormError]       = useState('')
+  const [stagesOpen, setStagesOpen]     = useState(true)
+  const [statusMenuId, setStatusMenuId] = useState(null)
 
   const scrollToStage = (si) => {
     setView('board')
@@ -109,8 +139,39 @@ export default function PipelinePage() {
     return () => window.removeEventListener('wheel', onWheel)
   }, [view])
 
+  useEffect(() => {
+    if (!statusMenuId) return
+    const close = () => setStatusMenuId(null)
+    document.addEventListener('click', close)
+    return () => document.removeEventListener('click', close)
+  }, [statusMenuId])
+
   const deal = deals.find(d => d.id === panelId) || null
   const stageColor = deal ? (STAGE_COLORS[deal.stage] || STAGE_COLORS[0]) : STAGE_COLORS[0]
+
+  const closeDeal = (id, status) => {
+    upd(id, { status })
+    setStatusMenuId(null)
+    if (panelId === id) setPanelId(null)
+  }
+
+  // ── Computed sets ──────────────────────────────────────────────
+  const activeDeals = deals.filter(d => !d.status || d.status === 'active')
+  const wonDeals    = deals.filter(d => d.status === 'won')
+  const lostDeals   = deals.filter(d => d.status === 'lost')
+
+  const stageTotal   = (i) => activeDeals.filter(d => d.stage === i).reduce((s, d) => s + Number(d.value || 0), 0)
+  const grandTotal   = activeDeals.reduce((s, d) => s + Number(d.value || 0), 0)
+  const activeTotal  = activeDeals.filter(d => d.stage < stages.length - 1).reduce((s, d) => s + Number(d.value || 0), 0)
+  const wonTotal     = wonDeals.reduce((s, d) => s + Number(d.value || 0), 0)
+  const lostTotal    = lostDeals.reduce((s, d) => s + Number(d.value || 0), 0)
+  const overdueCount = activeDeals.filter(d => d.next_step && isOverdue(d.next_step.reminderAt)).length
+  const totalClosed  = wonDeals.length + lostDeals.length
+  const winRate      = totalClosed > 0 ? Math.round(wonDeals.length / totalClosed * 100) : 0
+
+  const overdueDeals = activeDeals.filter(d => d.next_step?.reminderAt && isOverdue(d.next_step.reminderAt))
+  const todayDeals   = activeDeals.filter(d => d.next_step?.reminderAt && isDueToday(d.next_step.reminderAt))
+  const noStepDeals  = activeDeals.filter(d => !d.next_step && d.stage < stages.length - 1)
 
   const handleAddDeal = async () => {
     if (!form.name.trim()) { setFormError('Name is required'); return }
@@ -152,17 +213,6 @@ export default function PipelinePage() {
     setEditingStage(null)
   }
 
-  const stageTotal   = (i) => deals.filter(d => d.stage === i).reduce((s, d) => s + Number(d.value || 0), 0)
-  const grandTotal   = deals.reduce((s, d) => s + Number(d.value || 0), 0)
-  const activeTotal  = deals.filter(d => d.stage < stages.length - 1).reduce((s, d) => s + Number(d.value || 0), 0)
-  const closedTotal  = deals.filter(d => d.stage === stages.length - 1).reduce((s, d) => s + Number(d.value || 0), 0)
-  const overdueCount = deals.filter(d => d.next_step && isOverdue(d.next_step.reminderAt)).length
-  const winRate      = deals.length > 0 ? Math.round(deals.filter(d => d.stage === stages.length - 1).length / deals.length * 100) : 0
-
-  const overdueDeals = deals.filter(d => d.next_step?.reminderAt && isOverdue(d.next_step.reminderAt))
-  const todayDeals   = deals.filter(d => d.next_step?.reminderAt && isDueToday(d.next_step.reminderAt))
-  const noStepDeals  = deals.filter(d => !d.next_step && d.stage < stages.length - 1)
-
   if (!loaded) return (
     <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', fontFamily:'DM Sans,sans-serif', color:'var(--text-3)', fontSize:13 }}>
       Loading pipeline…
@@ -181,10 +231,13 @@ export default function PipelinePage() {
           <span className="topbar-addbtn-label">Add Deal</span>
         </button>
         <nav className="topbar-nav" style={{ display:'flex', alignItems:'center', gap:20 }}>
-          {[['board','Pipeline'],['today','Today']].map(([v, label]) => (
+          {[['board','Pipeline'],['today','Today'],['closed','Closed']].map(([v, label]) => (
             <button key={v} className="topbar-nav-btn" onClick={()=>setView(v)}
               style={{ background:'none', border:'none', borderBottom:`2px solid ${view===v ? 'var(--text-1)' : 'transparent'}`, color:'var(--text-1)', fontSize:13, fontWeight: view===v ? 600 : 400, cursor:'pointer', padding:'4px 0', letterSpacing:'0.1px', transition:'border-color 0.15s' }}>
               {label}
+              {v === 'closed' && totalClosed > 0 && (
+                <span style={{ marginLeft:5, fontSize:10, background:'var(--cream-dark)', color:'var(--text-3)', borderRadius:20, padding:'1px 6px', fontWeight:600 }}>{totalClosed}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -208,7 +261,7 @@ export default function PipelinePage() {
         <div className="summary-total" style={{ paddingRight:14, flexShrink:0 }}>
           <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:3 }}>Total Pipeline</div>
           <div className="summary-total-val" style={{ fontFamily:"'Libre Baskerville',serif", fontSize:24, fontWeight:700, color:'var(--text-1)', letterSpacing:'-0.5px', lineHeight:1 }}>{fmt$(grandTotal)}</div>
-          <div style={{ fontSize:11, color:'var(--text-3)', marginTop:4 }}>{deals.length} deal{deals.length !== 1 ? 's' : ''}</div>
+          <div style={{ fontSize:11, color:'var(--text-3)', marginTop:4 }}>{activeDeals.length} deal{activeDeals.length !== 1 ? 's' : ''}</div>
         </div>
 
         <div className="summary-divider" style={{ width:1, background:'var(--border-light)', alignSelf:'stretch', marginRight:14 }} />
@@ -234,7 +287,7 @@ export default function PipelinePage() {
                 let cumPct = 0
                 return stages.map((s, si) => {
                   const pct = grandTotal > 0 ? (stageTotal(si) / grandTotal) * 100 : 0
-                  const count = deals.filter(d => d.stage === si).length
+                  const count = activeDeals.filter(d => d.stage === si).length
                   const left = cumPct
                   cumPct += pct
                   if (!count || pct === 0) return null
@@ -255,7 +308,7 @@ export default function PipelinePage() {
           {/* Mobile: stacked list per stage with a proportional bar */}
           <div className="summary-stages-mobile">
             {stages.map((s, si) => {
-              const count = deals.filter(d => d.stage === si).length
+              const count = activeDeals.filter(d => d.stage === si).length
               if (!count) return null
               const pct = grandTotal > 0 ? (stageTotal(si) / grandTotal) * 100 : 0
               const isLast = si === stages.length - 1
@@ -278,7 +331,7 @@ export default function PipelinePage() {
         <div className="summary-divider" style={{ width:1, background:'var(--border-light)', alignSelf:'stretch', margin:'0 28px' }} />
 
         <div className="summary-kpis" style={{ display:'flex', gap:28, flexShrink:0 }}>
-          {[['Active', fmt$(activeTotal), 'var(--text-1)'], ['Won', fmt$(closedTotal), '#2D8A5E'], ['Win Rate', winRate+'%', winRate > 0 ? '#2D8A5E' : 'var(--text-3)']].map(([label, val, col]) => (
+          {[['Active', fmt$(activeTotal), 'var(--text-1)'], ['Won', fmt$(wonTotal), '#2D8A5E'], ['Win Rate', winRate+'%', winRate > 0 ? '#2D8A5E' : 'var(--text-3)']].map(([label, val, col]) => (
             <div key={label} style={{ textAlign:'center' }}>
               <div className="summary-kpi-label" style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:5 }}>{label}</div>
               <div className="summary-kpi-val" style={{ fontFamily:"'DM Mono',monospace", fontSize:14, color:col, fontWeight:500 }}>{val}</div>
@@ -340,7 +393,7 @@ export default function PipelinePage() {
           {stages.map((stage, si) => {
             const dot   = STAGE_COLORS[si] || STAGE_COLORS[0]
             const sbg   = STAGE_BG[si]     || STAGE_BG[0]
-            const stDeals = deals.filter(d => d.stage === si)
+            const stDeals = activeDeals.filter(d => d.stage === si)
             const isLast  = si === stages.length - 1
             return (
               <div key={si}
@@ -373,13 +426,14 @@ export default function PipelinePage() {
                     const od = ns?.reminderAt && isOverdue(ns.reminderAt)
                     const st = STEP_TYPES.find(t => t.key === ns?.type)
                     const dt = getDealType(d.deal_type)
+                    const menuOpen = statusMenuId === d.id
                     return (
                       <div key={d.id} className="deal-card"
                         draggable="true"
                         onDragStart={e => { setDragId(d.id); e.dataTransfer.effectAllowed = 'move' }}
                         onDragEnd={() => { setDragId(null); setDragOver(null) }}
                         onClick={()=>openPanel(d.id)}
-                        style={{ background:'var(--card-bg)', border:`1px solid ${panelId===d.id ? dot : 'var(--card-border)'}`, borderRadius:9, padding:'11px 12px', marginBottom:6, cursor:'grab', opacity: dragId===d.id ? 0.45 : 1, transition:'opacity 0.15s' }}>
+                        style={{ background:'var(--card-bg)', border:`1px solid ${panelId===d.id ? dot : 'var(--card-border)'}`, borderRadius:9, padding:'11px 12px', marginBottom:6, cursor:'grab', opacity: dragId===d.id ? 0.45 : 1, transition:'opacity 0.15s', position:'relative' }}>
                         <div style={{ display:'flex', justifyContent:'space-between', gap:6, alignItems:'flex-start' }}>
                           <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ fontWeight:600, fontSize:15.5, color:'var(--text-1)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{d.name}</div>
@@ -406,7 +460,24 @@ export default function PipelinePage() {
                               <span style={{ fontSize:11, color:'var(--text-3)', background:'var(--cream)', borderRadius:4, padding:'1px 6px', border:'1px solid var(--border-light)' }}>📝 {d.notes.length}</span>
                             )}
                           </div>
-                          <div style={{ display:'flex', gap:1 }} onClick={e=>e.stopPropagation()}>
+                          <div style={{ display:'flex', gap:1, alignItems:'center' }} onClick={e=>e.stopPropagation()}>
+                            {menuOpen ? (
+                              <>
+                                <button onClick={()=>closeDeal(d.id,'won')}
+                                  style={{ background:'#DCFCE7', border:'1px solid #BBF7D0', color:'#15803D', fontSize:11, fontWeight:600, padding:'2px 7px', borderRadius:4, cursor:'pointer' }}>
+                                  ✓ Won
+                                </button>
+                                <button onClick={()=>closeDeal(d.id,'lost')}
+                                  style={{ background:'#FEE2E2', border:'1px solid #FECACA', color:'#B91C1C', fontSize:11, fontWeight:600, padding:'2px 7px', borderRadius:4, cursor:'pointer', marginLeft:3 }}>
+                                  ✗ Lost
+                                </button>
+                                <button onClick={e=>{ e.stopPropagation(); setStatusMenuId(null) }}
+                                  style={{ background:'none', border:'none', color:'var(--text-4)', fontSize:14, padding:'1px 4px', cursor:'pointer', marginLeft:2 }}>×</button>
+                              </>
+                            ) : (
+                              <button className="move-btn" onClick={e=>{ e.stopPropagation(); setStatusMenuId(d.id) }}
+                                style={{ background:'none', border:'none', color:'var(--text-3)', fontSize:14, fontWeight:700, padding:'1px 5px', borderRadius:4, cursor:'pointer', letterSpacing:'1px' }}>···</button>
+                            )}
                             {si > 0 && <button className="move-btn" onClick={()=>moveDeal(d.id,-1)} style={{ background:'none', border:'none', color:'var(--text-3)', fontSize:14, padding:'1px 5px', borderRadius:4, cursor:'pointer' }}>←</button>}
                             {si < stages.length-1 && <button className="move-btn" onClick={()=>moveDeal(d.id,1)} style={{ background:'none', border:'none', color:dot, fontSize:14, fontWeight:700, padding:'1px 5px', borderRadius:4, cursor:'pointer' }}>→</button>}
                           </div>
@@ -427,6 +498,68 @@ export default function PipelinePage() {
             )
           })}
         </div>
+        )}
+
+        {view === 'closed' && (
+          <div style={{ flex:1, overflowY:'auto', padding:'24px 28px', background:'var(--cream)' }}>
+            <div style={{ maxWidth:760, margin:'0 auto' }}>
+
+              {/* Metrics */}
+              <div style={{ display:'flex', gap:14, marginBottom:32 }}>
+                <div style={{ flex:1, background:'var(--white)', border:'1px solid var(--border-light)', borderRadius:12, padding:'18px 20px', boxShadow:'var(--shadow-sm)' }}>
+                  <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:4 }}>Won</div>
+                  <div style={{ fontFamily:"'Libre Baskerville',serif", fontSize:22, fontWeight:700, color:'#2D8A5E', letterSpacing:'-0.3px' }}>{fmt$(wonTotal)}</div>
+                  <div style={{ fontSize:12, color:'var(--text-3)', marginTop:3 }}>{wonDeals.length} deal{wonDeals.length !== 1 ? 's' : ''}</div>
+                </div>
+                <div style={{ flex:1, background:'var(--white)', border:'1px solid var(--border-light)', borderRadius:12, padding:'18px 20px', boxShadow:'var(--shadow-sm)' }}>
+                  <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:4 }}>Lost</div>
+                  <div style={{ fontFamily:"'Libre Baskerville',serif", fontSize:22, fontWeight:700, color:'#B91C1C', letterSpacing:'-0.3px' }}>{fmt$(lostTotal)}</div>
+                  <div style={{ fontSize:12, color:'var(--text-3)', marginTop:3 }}>{lostDeals.length} deal{lostDeals.length !== 1 ? 's' : ''}</div>
+                </div>
+                <div style={{ flex:1, background:'var(--white)', border:'1px solid var(--border-light)', borderRadius:12, padding:'18px 20px', boxShadow:'var(--shadow-sm)' }}>
+                  <div style={{ fontSize:10, color:'var(--text-3)', textTransform:'uppercase', letterSpacing:'0.8px', fontWeight:600, marginBottom:4 }}>Win Rate</div>
+                  <div style={{ fontFamily:"'Libre Baskerville',serif", fontSize:22, fontWeight:700, color: winRate > 50 ? '#2D8A5E' : winRate > 0 ? '#92400E' : 'var(--text-3)', letterSpacing:'-0.3px' }}>{winRate}%</div>
+                  <div style={{ fontSize:12, color:'var(--text-3)', marginTop:3 }}>{totalClosed} closed total</div>
+                </div>
+              </div>
+
+              {/* Won deals */}
+              {wonDeals.length > 0 && (
+                <div style={{ marginBottom:32 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
+                    <span style={{ fontSize:13, fontWeight:700, color:'#2D8A5E', fontFamily:"'Libre Baskerville',serif" }}>✓ Won</span>
+                    <span style={{ fontSize:11, background:'#DCFCE7', color:'#15803D', border:'1px solid #BBF7D0', borderRadius:20, padding:'1px 8px', fontWeight:600 }}>{wonDeals.length}</span>
+                  </div>
+                  {wonDeals.map(d => (
+                    <ClosedDealRow key={d.id} d={d} stages={stages} type="won"
+                      onReactivate={()=>upd(d.id, { status:'active' })} />
+                  ))}
+                </div>
+              )}
+
+              {/* Lost deals */}
+              {lostDeals.length > 0 && (
+                <div style={{ marginBottom:32 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
+                    <span style={{ fontSize:13, fontWeight:700, color:'#B91C1C', fontFamily:"'Libre Baskerville',serif" }}>✗ Lost</span>
+                    <span style={{ fontSize:11, background:'#FEE2E2', color:'#B91C1C', border:'1px solid #FECACA', borderRadius:20, padding:'1px 8px', fontWeight:600 }}>{lostDeals.length}</span>
+                  </div>
+                  {lostDeals.map(d => (
+                    <ClosedDealRow key={d.id} d={d} stages={stages} type="lost"
+                      onReactivate={()=>upd(d.id, { status:'active' })} />
+                  ))}
+                </div>
+              )}
+
+              {totalClosed === 0 && (
+                <div style={{ textAlign:'center', paddingTop:60 }}>
+                  <div style={{ fontSize:36, marginBottom:12 }}>📁</div>
+                  <div style={{ fontFamily:"'Libre Baskerville',serif", fontSize:17, color:'var(--text-1)', fontWeight:700, marginBottom:6 }}>No closed deals yet</div>
+                  <div style={{ fontSize:13, color:'var(--text-3)' }}>Mark deals as Won or Lost from the Pipeline board.</div>
+                </div>
+              )}
+            </div>
+          </div>
         )}
 
         {/* ── SIDE PANEL ── */}

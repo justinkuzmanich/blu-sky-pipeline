@@ -32,6 +32,7 @@ create table public.deals (
   deal_type   text,
   notes       jsonb default '[]'::jsonb,
   next_step   jsonb,
+  status      text default 'active',
   created_at  timestamptz default now(),
   updated_at  timestamptz default now()
 );
