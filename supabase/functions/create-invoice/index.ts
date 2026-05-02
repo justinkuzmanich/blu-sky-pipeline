@@ -5,6 +5,19 @@ const INVOICED_STAGE = 3
 const SQUARE_API     = 'https://connect.squareup.com'
 const SQUARE_VERSION = '2024-01-18'
 
+const DEAL_TYPE_LABELS: Record<string, string> = {
+  'video':        'Video',
+  'listing-video':'Listing Video',
+  'social-video': 'Social Video',
+  'website':      'Website',
+  'social':       'Social Media',
+  'ads':          'Paid Ads',
+  'photo':        'Photography',
+  'consult':      'Consulting',
+  'techsupport':  'Tech Support',
+  'other':        'Other',
+}
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -113,12 +126,19 @@ Deno.serve(async (req) => {
   }
 
   // ── 2. Create order — line item + 3.4% Tax ───────────────────
+  const typeLabel  = DEAL_TYPE_LABELS[deal.deal_type] || deal.deal_type || 'Service'
+
+  // Extract address from the first note (format: "... • Address: XYZ • ...")
+  const noteText   = (deal.notes as any)?.[0]?.text || ''
+  const addrMatch  = noteText.match(/Address:\s*([^•\n]+)/)
+  const address    = addrMatch?.[1]?.trim() || ''
+
   const orderRes  = await sq('/v2/orders', {
     idempotency_key: `order-${deal.id}`,
     order: {
       location_id: locationId,
       line_items: [{
-        name:             deal.name,
+        name:             typeLabel,
         quantity:         '1',
         base_price_money: {
           amount:   Math.round(Number(deal.value) * 100),
@@ -155,7 +175,7 @@ Deno.serve(async (req) => {
       primary_recipient: { customer_id: customerId },
       payment_requests:  [{ request_type: 'BALANCE', due_date: dueDateStr }],
       delivery_method:   'SHARE_MANUALLY',
-      title:             'Blu Sky Films',
+      title:             [typeLabel, `$${Number(deal.value).toFixed(2)}`, address].filter(Boolean).join(' — '),
       accepted_payment_methods: {
         card:                true,
         square_gift_card:    false,
