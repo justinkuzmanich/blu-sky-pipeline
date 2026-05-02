@@ -255,5 +255,73 @@ Deno.serve(async (req) => {
     }
   }
 
+  // ── 7. Create Gmail draft ─────────────────────────────────────
+  const gmailClientId     = Deno.env.get('GMAIL_CLIENT_ID')
+  const gmailClientSecret = Deno.env.get('GMAIL_CLIENT_SECRET')
+  const gmailRefreshToken = Deno.env.get('GMAIL_REFRESH_TOKEN')
+
+  if (!gmailClientId || !gmailClientSecret || !gmailRefreshToken) {
+    console.warn('Gmail env vars not set — draft skipped')
+  } else {
+    try {
+      // Exchange refresh token for access token
+      const tokenRes  = await fetch('https://oauth2.googleapis.com/token', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          client_id:     gmailClientId,
+          client_secret: gmailClientSecret,
+          refresh_token: gmailRefreshToken,
+          grant_type:    'refresh_token',
+        }),
+      })
+      const tokenData = await tokenRes.json()
+
+      if (!tokenData.access_token) {
+        console.error('Failed to get Gmail access token:', tokenData)
+      } else {
+        const firstName = deal.name.trim().split(' ')[0]
+        const emailBody =
+          `Hi ${firstName},\n\n` +
+          `Thanks for reaching out to Blu Sky Films. Here is a link to your invoice, once paid, your ${typeLabel} is booked and we are all set to go.\n\n` +
+          `${invoiceUrl}\n\n` +
+          `Looking forward to creating some engaging marketing with you!\n\n` +
+          `Best,\nJustin`
+
+        const rawEmail = [
+          `From: justin@bluskyfilms.com`,
+          `To: ${deal.email}`,
+          `Subject: Your ${typeLabel} Invoice — Blu Sky Films`,
+          `Content-Type: text/plain; charset=utf-8`,
+          ``,
+          emailBody,
+        ].join('\r\n')
+
+        // Base64url encode for Gmail API
+        const bytes  = new TextEncoder().encode(rawEmail)
+        let binary   = ''
+        bytes.forEach(b => binary += String.fromCharCode(b))
+        const raw    = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+
+        const draftRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/drafts', {
+          method:  'POST',
+          headers: {
+            'Authorization': `Bearer ${tokenData.access_token}`,
+            'Content-Type':  'application/json',
+          },
+          body: JSON.stringify({ message: { raw } }),
+        })
+
+        if (!draftRes.ok) {
+          console.error('Failed to create Gmail draft:', await draftRes.text())
+        } else {
+          console.log('Gmail draft created for', deal.email)
+        }
+      }
+    } catch (err) {
+      console.error('Gmail draft failed:', err)
+    }
+  }
+
   return json({ ok: true, invoice_url: invoiceUrl })
 })
