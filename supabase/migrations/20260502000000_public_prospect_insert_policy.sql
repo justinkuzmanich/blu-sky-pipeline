@@ -4,7 +4,7 @@
 --          requests) insert a single Prospect deal (stage = 0)
 --          into the pipeline owner's account.
 --
--- BEFORE applying: replace OWNER_USER_ID_PLACEHOLDER with the
+-- BEFORE applying: replace 48218afa-906b-44ed-903c-fb4dcc6473aa with the
 -- actual UUID of the Bluskyfilms Supabase account.
 -- Find it in: Supabase Dashboard → Authentication → Users.
 --
@@ -29,7 +29,7 @@ create policy "allow_public_prospect_insert"
 
     -- Must target the pipeline owner's account
     -- Replace the placeholder with the real UUID before applying
-    and user_id = 'OWNER_USER_ID_PLACEHOLDER'
+    and user_id = '48218afa-906b-44ed-903c-fb4dcc6473aa'
 
     -- Status must be active (default) — can't pre-close a deal
     and (status is null or status = 'active')
