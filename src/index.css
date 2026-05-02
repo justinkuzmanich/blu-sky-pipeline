@@ -134,6 +134,17 @@ textarea { resize: none; }
   .summary-stages-mobile  { display: block !important; }
 }
 
+/* Deal modal enter/exit animation */
+@keyframes modal-overlay-in  { from { opacity:0 } to { opacity:1 } }
+@keyframes modal-overlay-out { from { opacity:1 } to { opacity:0 } }
+@keyframes modal-box-in  { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
+@keyframes modal-box-out { from { opacity:1; transform:translateY(0) } to { opacity:0; transform:translateY(24px) } }
+
+.deal-modal-overlay          { animation: modal-overlay-in  180ms ease-out forwards; }
+.deal-modal-overlay.exiting  { animation: modal-overlay-out 180ms ease-in  forwards; }
+.deal-modal-overlay .deal-modal-box         { animation: modal-box-in  180ms ease-out forwards; }
+.deal-modal-overlay.exiting .deal-modal-box { animation: modal-box-out 180ms ease-in  forwards; }
+
 /* Mobile deal modal — top edge aligns with first deal card position */
 /* 88px = board padding-top(18) + column header(62) + stage-cards padding-top(8) */
 @media (max-width: 640px) {

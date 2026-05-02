@@ -108,6 +108,7 @@ export default function PipelinePage() {
   const [formError, setFormError]       = useState('')
   const [stagesOpen, setStagesOpen]     = useState(true)
   const [statusMenuId, setStatusMenuId] = useState(null)
+  const [modalClosing, setModalClosing]  = useState(false)
 
   const scrollToStage = (si) => {
     setView('board')
@@ -118,7 +119,8 @@ export default function PipelinePage() {
 
   const nameRef = useRef(null)
   const noteRef = useRef(null)
-  const boardRef = useRef(null)
+  const boardRef      = useRef(null)
+  const closingTimer  = useRef(null)
 
   useEffect(() => { if (showForm) setTimeout(() => nameRef.current?.focus(), 50) }, [showForm])
 
@@ -156,7 +158,7 @@ export default function PipelinePage() {
   const closeDeal = (id, status) => {
     upd(id, { status })
     setStatusMenuId(null)
-    if (panelId === id) setPanelId(null)
+    if (panelId === id) closeModal()
   }
 
   // ── Computed sets ──────────────────────────────────────────────
@@ -208,7 +210,20 @@ export default function PipelinePage() {
 
   const saveNs   = () => { if (!deal || !nsDraft?.type) return; upd(deal.id, { next_step: nsDraft }); setNsDraft(null) }
   const clearNs  = () => { upd(deal.id, { next_step: null }); setNsDraft(null) }
-  const openPanel = (id, tab) => { setPanelId(id); setActiveTab(tab || 'notes'); setNsDraft(null); setNewNote('') }
+  const closeModal = () => {
+    if (closingTimer.current) clearTimeout(closingTimer.current)
+    setModalClosing(true)
+    closingTimer.current = setTimeout(() => {
+      setPanelId(null)
+      setModalClosing(false)
+      closingTimer.current = null
+    }, 180)
+  }
+
+  const openPanel = (id, tab) => {
+    if (closingTimer.current) { clearTimeout(closingTimer.current); closingTimer.current = null; setModalClosing(false) }
+    setPanelId(id); setActiveTab(tab || 'notes'); setNsDraft(null); setNewNote('')
+  }
   const startEditStage = (i) => { setEditingStage(i); setStageInput(stages[i]) }
   const saveStage = () => {
     if (editingStage === null) return
@@ -571,7 +586,7 @@ export default function PipelinePage() {
 
       {/* ── DEAL MODAL ── */}
       {deal && (
-        <div className="deal-modal-overlay" style={{ position:'absolute', inset:0, background:'rgba(28,25,23,0.45)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:50, backdropFilter:'blur(4px)' }} onClick={()=>setPanelId(null)}>
+        <div className={`deal-modal-overlay${modalClosing ? ' exiting' : ''}`} style={{ position:'absolute', inset:0, background:'rgba(28,25,23,0.45)', display:'flex', alignItems:'center', justifyContent:'center', zIndex:50, backdropFilter:'blur(4px)' }} onClick={closeModal}>
           <div className="deal-modal-box" style={{ width:'100%', maxWidth:560, maxHeight:'90vh', background:'var(--white)', borderRadius:16, display:'flex', flexDirection:'column', overflow:'hidden', boxShadow:'var(--shadow-lg)', margin:'0 24px' }} onClick={e=>e.stopPropagation()}>
             <div style={{ padding:'16px 18px 12px', borderBottom:'1px solid var(--border-light)', flexShrink:0 }}>
               <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
@@ -583,7 +598,7 @@ export default function PipelinePage() {
                   {deal.deal_type && (() => { const dt = getDealType(deal.deal_type); return dt ? <span style={{ fontSize:12, background:dt.bg, color:dt.color, borderRadius:5, padding:'2px 8px', fontWeight:600 }}>{dt.icon} {dt.label}</span> : null })()}
                   {deal.value > 0 && <div style={{ fontFamily:"'DM Mono',monospace", fontSize:13, color:stageColor, fontWeight:600 }}>{fmt$(deal.value)}</div>}
                   <button onClick={()=>setActiveTab('contact')} title="Edit deal" style={{ background:'none', border:'1px solid var(--border)', borderRadius:6, color:'var(--text-3)', fontSize:13, lineHeight:1, cursor:'pointer', padding:'3px 7px' }}>✏️</button>
-                  <button onClick={()=>setPanelId(null)} style={{ background:'none', border:'none', color:'var(--text-3)', fontSize:20, lineHeight:1, cursor:'pointer', padding:'0 2px' }}>×</button>
+                  <button onClick={closeModal} style={{ background:'none', border:'none', color:'var(--text-3)', fontSize:20, lineHeight:1, cursor:'pointer', padding:'0 2px' }}>×</button>
                 </div>
               </div>
               <div style={{ display:'flex', gap:4, flexWrap:'wrap' }}>
