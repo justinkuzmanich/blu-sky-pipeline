@@ -134,9 +134,10 @@ textarea { resize: none; }
   .summary-stages-mobile  { display: block !important; }
 }
 
-/* Mobile deal modal — top-aligned to stage cards area */
+/* Mobile deal modal — top edge aligns with first deal card position */
+/* 88px = board padding-top(18) + column header(62) + stage-cards padding-top(8) */
 @media (max-width: 640px) {
-  .deal-modal-overlay { align-items: flex-start !important; }
+  .deal-modal-overlay { align-items: flex-start !important; padding-top: 88px !important; }
   .deal-modal-box {
     margin: 0 !important;
     max-width: 100% !important;
