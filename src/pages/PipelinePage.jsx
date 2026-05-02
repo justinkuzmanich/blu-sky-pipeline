@@ -746,9 +746,9 @@ export default function PipelinePage() {
                         style={{ width:'100%', background:'var(--white)', border:'1px solid var(--border)', borderRadius:7, padding:'7px 11px', color:'var(--text-1)', fontSize:12, marginTop:7, boxShadow:'var(--shadow-sm)' }} />
                     )}
                   </div>
-                  <div style={{ borderTop:'1px solid var(--border-light)', paddingTop:16, marginTop:4 }}>
-                    <button onClick={()=>{ deleteDeal(deal.id); setPanelId(null) }}
-                      style={{ width:'100%', background:'#FEE2E2', color:'#B91C1C', border:'1px solid #FECACA', borderRadius:8, padding:'9px', fontSize:13, fontWeight:500, cursor:'pointer' }}>
+                  <div style={{ borderTop:'1px solid var(--border-light)', paddingTop:14, marginTop:4, display:'flex', justifyContent:'center' }}>
+                    <button onClick={()=>{ if (!window.confirm('Delete this deal? This cannot be undone.')) return; deleteDeal(deal.id); setPanelId(null) }}
+                      style={{ background:'none', border:'1px solid #FECACA', color:'#B91C1C', borderRadius:6, padding:'5px 14px', fontSize:12, fontWeight:500, cursor:'pointer' }}>
                       Delete Deal
                     </button>
                   </div>
