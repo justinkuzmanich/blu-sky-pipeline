@@ -110,7 +110,8 @@ Deno.serve(async (req) => {
       'Email: ' + email.trim() +
       (shootDate?.trim() ? '\nShoot date: ' + shootDate.trim() : '') +
       (address?.trim() ? '\nAddress: ' + address.trim() : '') +
-      (message?.trim() ? '\n\nMessage: ' + message.trim() : '')
+      (message?.trim() ? '\n\nMessage: ' + message.trim() : '') +
+      '\n\n👉 https://justinkuzmanich.github.io/blu-sky-pipeline/'
 
     try {
       const res = await fetch(
