@@ -128,10 +128,17 @@ Deno.serve(async (req) => {
   // ── 2. Create order — line item + 3.4% Tax ───────────────────
   const typeLabel  = DEAL_TYPE_LABELS[deal.deal_type] || deal.deal_type || 'Service'
 
-  // Extract address from the first note (format: "... • Address: XYZ • ...")
+  // Parse fields from the first note (format: "Service: X • Shoot date: Y • Address: Z • Message: W")
   const noteText   = (deal.notes as any)?.[0]?.text || ''
   const addrMatch  = noteText.match(/Address:\s*([^•\n]+)/)
   const address    = addrMatch?.[1]?.trim() || ''
+  const shootMatch = noteText.match(/Shoot date:\s*([^•\n]+)/)
+  const shootDate  = shootMatch?.[1]?.trim() || ''
+  const msgMatch   = noteText.match(/Message:\s*([^•\n]+)/)
+  const message    = msgMatch?.[1]?.trim() || ''
+
+  // Compose line item note: shoot date + message
+  const lineNote   = [shootDate ? `Shoot date: ${shootDate}` : '', message].filter(Boolean).join(' · ')
 
   const orderRes  = await sq('/v2/orders', {
     idempotency_key: `order-${deal.id}`,
@@ -145,6 +152,7 @@ Deno.serve(async (req) => {
           currency: 'USD',
         },
         applied_taxes: [{ tax_uid: 'tax-1' }],
+        ...(lineNote && { note: lineNote }),
       }],
       taxes: [{
         uid:        'tax-1',
@@ -175,7 +183,7 @@ Deno.serve(async (req) => {
       primary_recipient: { customer_id: customerId },
       payment_requests:  [{ request_type: 'BALANCE', due_date: dueDateStr }],
       delivery_method:   'SHARE_MANUALLY',
-      title:             [typeLabel, `$${Number(deal.value).toFixed(2)}`, address].filter(Boolean).join(' — '),
+      title:             address ? `${typeLabel} : ${address}` : typeLabel,
       accepted_payment_methods: {
         card:                true,
         square_gift_card:    false,
