@@ -95,37 +95,37 @@ Deno.serve(async (req) => {
     return json({ ok: false, error: 'Failed to save inquiry' }, 500)
   }
 
-  // ── Send SMS via Twilio (non-fatal) ───────────────────────────
-  const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID')
-  const authToken  = Deno.env.get('TWILIO_AUTH_TOKEN')
-  const fromNumber = Deno.env.get('TWILIO_FROM_NUMBER')
-  const toNumber   = Deno.env.get('TWILIO_TO_NUMBER')
+  // ── Send Telegram notification (non-fatal) ───────────────────
+  const tgToken  = Deno.env.get('TELEGRAM_BOT_TOKEN')
+  const tgChatId = Deno.env.get('TELEGRAM_CHAT_ID')
 
-  if (!accountSid || !authToken || !fromNumber || !toNumber) {
-    console.warn('Twilio env vars not set — SMS skipped')
+  if (!tgToken || !tgChatId) {
+    console.warn('Telegram env vars not set, notification skipped')
   } else {
-    const smsText =
-      `🎬 New Blu Sky Films inquiry: ${name.trim()} · ` +
-      `${service_label?.trim() || service_value} · ` +
-      `${phone.trim()} · ${email.trim()}`
+    const text =
+      '🎬 New Blu Sky Films inquiry\n\n' +
+      'Name: ' + name.trim() + '\n' +
+      'Service: ' + (service_label?.trim() || service_value) + '\n' +
+      'Phone: ' + phone.trim() + '\n' +
+      'Email: ' + email.trim() +
+      (shootDate?.trim() ? '\nShoot date: ' + shootDate.trim() : '') +
+      (address?.trim() ? '\nAddress: ' + address.trim() : '') +
+      (message?.trim() ? '\n\nMessage: ' + message.trim() : '')
 
     try {
       const res = await fetch(
-        `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+        'https://api.telegram.org/bot' + tgToken + '/sendMessage',
         {
           method:  'POST',
-          headers: {
-            'Authorization': `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-            'Content-Type':  'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({ From: fromNumber, To: toNumber, Body: smsText }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: tgChatId, text }),
         },
       )
       if (!res.ok) {
-        console.error('Twilio error:', res.status, await res.text())
+        console.error('Telegram error:', res.status, await res.text())
       }
     } catch (err) {
-      console.error('Twilio request failed:', err)
+      console.error('Telegram request failed:', err)
     }
   }
 
