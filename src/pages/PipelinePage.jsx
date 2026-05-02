@@ -746,6 +746,16 @@ export default function PipelinePage() {
                         style={{ width:'100%', background:'var(--white)', border:'1px solid var(--border)', borderRadius:7, padding:'7px 11px', color:'var(--text-1)', fontSize:12, marginTop:7, boxShadow:'var(--shadow-sm)' }} />
                     )}
                   </div>
+                  {deal.invoice_url && (
+                    <div style={{ borderTop:'1px solid var(--border-light)', paddingTop:14, marginTop:4 }}>
+                      <Label>🧾 Invoice</Label>
+                      <a href={deal.invoice_url} target="_blank" rel="noopener noreferrer"
+                        style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 11px', background:'var(--cream)', border:'1px solid var(--border)', borderRadius:7, color:stageColor, fontSize:13, textDecoration:'none', fontWeight:500, boxShadow:'var(--shadow-sm)' }}>
+                        <span>View Invoice</span>
+                        <span style={{ fontSize:11 }}>↗</span>
+                      </a>
+                    </div>
+                  )}
                   <div style={{ borderTop:'1px solid var(--border-light)', paddingTop:14, marginTop:4, display:'flex', justifyContent:'center' }}>
                     <button onClick={()=>{ if (!window.confirm('Delete this deal? This cannot be undone.')) return; deleteDeal(deal.id); setPanelId(null) }}
                       style={{ background:'none', border:'1px solid #FECACA', color:'#B91C1C', borderRadius:6, padding:'5px 14px', fontSize:12, fontWeight:500, cursor:'pointer' }}>

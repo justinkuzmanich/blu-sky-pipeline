@@ -1,0 +1,224 @@
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+const OWNER_USER_ID  = '48218afa-906b-44ed-903c-fb4dcc6473aa'
+const INVOICED_STAGE = 3
+const SQUARE_API     = 'https://connect.squareup.com'
+const SQUARE_VERSION = '2024-01-18'
+
+const json = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  })
+
+interface Deal {
+  id:          string
+  user_id:     string
+  stage:       number
+  name:        string
+  email:       string
+  phone:       string
+  business:    string
+  value:       number
+  deal_type:   string
+  invoice_url: string | null
+}
+
+interface WebhookPayload {
+  type:       string
+  table:      string
+  record:     Deal
+  old_record: Deal
+}
+
+Deno.serve(async (req) => {
+  if (req.method !== 'POST') {
+    return json({ ok: false, error: 'Method not allowed' }, 405)
+  }
+
+  let payload: WebhookPayload
+  try {
+    payload = await req.json()
+  } catch {
+    return json({ ok: false, error: 'Invalid JSON' }, 400)
+  }
+
+  const { record: deal, old_record: oldDeal } = payload
+
+  // Only fire on transition TO Invoiced — ignore all other updates
+  if (deal.stage !== INVOICED_STAGE || oldDeal?.stage === INVOICED_STAGE) {
+    return json({ ok: true, skipped: true })
+  }
+
+  // Safety: only process the owner's deals
+  if (deal.user_id !== OWNER_USER_ID) {
+    return json({ ok: true, skipped: true })
+  }
+
+  // Skip if an invoice was already created (e.g. moved away then back)
+  if (deal.invoice_url) {
+    return json({ ok: true, skipped: true, reason: 'invoice already exists' })
+  }
+
+  if (!deal.email?.trim()) {
+    console.warn('Deal has no email — cannot create Square invoice:', deal.id)
+    return json({ ok: false, error: 'Deal has no email address' }, 422)
+  }
+
+  const squareToken = Deno.env.get('SQUARE_ACCESS_TOKEN')
+  const locationId  = Deno.env.get('SQUARE_LOCATION_ID')
+
+  if (!squareToken || !locationId) {
+    console.error('Square env vars not configured')
+    return json({ ok: false, error: 'Square not configured' }, 500)
+  }
+
+  const sq = (path: string, body: unknown) =>
+    fetch(`${SQUARE_API}${path}`, {
+      method:  'POST',
+      headers: {
+        'Authorization':  `Bearer ${squareToken}`,
+        'Content-Type':   'application/json',
+        'Square-Version': SQUARE_VERSION,
+      },
+      body: JSON.stringify(body),
+    })
+
+  // ── 1. Find or create Square customer ────────────────────────
+  let customerId: string
+
+  const searchRes  = await sq('/v2/customers/search', {
+    query: { filter: { email_address: { exact: deal.email } } },
+  })
+  const searchData = await searchRes.json()
+
+  if (searchData.customers?.length > 0) {
+    customerId = searchData.customers[0].id
+  } else {
+    const parts     = deal.name.trim().split(' ')
+    const createRes  = await sq('/v2/customers', {
+      idempotency_key: `cust-${deal.id}`,
+      email_address:   deal.email,
+      given_name:      parts[0],
+      family_name:     parts.slice(1).join(' ') || '',
+      ...(deal.phone    && { phone_number:  deal.phone }),
+      ...(deal.business && { company_name: deal.business }),
+    })
+    const createData = await createRes.json()
+    if (!createData.customer?.id) {
+      console.error('Failed to create Square customer:', createData)
+      return json({ ok: false, error: 'Failed to create customer' }, 500)
+    }
+    customerId = createData.customer.id
+  }
+
+  // ── 2. Create order — line item + 3.4% Tax ───────────────────
+  const orderRes  = await sq('/v2/orders', {
+    idempotency_key: `order-${deal.id}`,
+    order: {
+      location_id: locationId,
+      line_items: [{
+        name:             deal.name,
+        quantity:         '1',
+        base_price_money: {
+          amount:   Math.round(Number(deal.value) * 100),
+          currency: 'USD',
+        },
+        applied_taxes: [{ tax_uid: 'tax-1' }],
+      }],
+      taxes: [{
+        uid:        'tax-1',
+        name:       'Tax',
+        percentage: '3.4',
+        scope:      'LINE_ITEM',
+      }],
+    },
+  })
+  const orderData = await orderRes.json()
+  const orderId   = orderData.order?.id
+
+  if (!orderId) {
+    console.error('Failed to create Square order:', orderData)
+    return json({ ok: false, error: 'Failed to create order' }, 500)
+  }
+
+  // ── 3. Create invoice ─────────────────────────────────────────
+  const dueDate = new Date()
+  dueDate.setDate(dueDate.getDate() + 7)
+  const dueDateStr = dueDate.toISOString().split('T')[0]
+
+  const invoiceRes  = await sq('/v2/invoices', {
+    idempotency_key: `inv-${deal.id}`,
+    invoice: {
+      location_id:       locationId,
+      order_id:          orderId,
+      primary_recipient: { customer_id: customerId },
+      payment_requests:  [{ request_type: 'BALANCE', due_date: dueDateStr }],
+      delivery_method:   'SHARE_MANUALLY',
+      title:             'Blu Sky Films',
+    },
+  })
+  const invoiceData    = await invoiceRes.json()
+  const invoiceId      = invoiceData.invoice?.id
+  const invoiceVersion = invoiceData.invoice?.version
+
+  if (!invoiceId) {
+    console.error('Failed to create Square invoice:', invoiceData)
+    return json({ ok: false, error: 'Failed to create invoice' }, 500)
+  }
+
+  // ── 4. Publish → get public_url ───────────────────────────────
+  const publishRes  = await sq(`/v2/invoices/${invoiceId}/publish`, {
+    idempotency_key: `pub-${deal.id}`,
+    version:         invoiceVersion,
+  })
+  const publishData = await publishRes.json()
+  const invoiceUrl  = publishData.invoice?.public_url
+
+  if (!invoiceUrl) {
+    console.error('Failed to publish Square invoice:', publishData)
+    return json({ ok: false, error: 'Failed to publish invoice' }, 500)
+  }
+
+  // ── 5. Save invoice_url back to deal ──────────────────────────
+  const supabase = createClient(
+    Deno.env.get('SUPABASE_URL')!,
+    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
+  )
+
+  const { error: updateError } = await supabase
+    .from('deals')
+    .update({ invoice_url: invoiceUrl })
+    .eq('id', deal.id)
+
+  if (updateError) {
+    // Invoice exists — log but don't fail
+    console.error('Failed to save invoice_url to deal:', updateError)
+  }
+
+  // ── 6. Telegram notification ──────────────────────────────────
+  const tgToken  = Deno.env.get('TELEGRAM_BOT_TOKEN')
+  const tgChatId = Deno.env.get('TELEGRAM_CHAT_ID')
+
+  if (tgToken && tgChatId) {
+    const text =
+      '🧾 Invoice created\n\n' +
+      'Deal: '    + deal.name + '\n' +
+      'Amount: $' + Number(deal.value).toFixed(2) + ' + 3.4% tax\n' +
+      'Client: '  + deal.email + '\n\n' +
+      '💳 ' + invoiceUrl + '\n\n' +
+      '👉 https://justinkuzmanich.github.io/blu-sky-pipeline/'
+
+    try {
+      await fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: tgChatId, text }),
+      })
+    } catch (err) {
+      console.error('Telegram notification failed:', err)
+    }
+  }
+
+  return json({ ok: true, invoice_url: invoiceUrl })
+})
