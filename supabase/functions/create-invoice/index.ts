@@ -156,6 +156,13 @@ Deno.serve(async (req) => {
       payment_requests:  [{ request_type: 'BALANCE', due_date: dueDateStr }],
       delivery_method:   'SHARE_MANUALLY',
       title:             'Blu Sky Films',
+      accepted_payment_methods: {
+        card:                true,
+        square_gift_card:    false,
+        bank_account:        false,
+        buy_now_pay_later:   false,
+        cash_app_pay:        false,
+      },
     },
   })
   const invoiceData    = await invoiceRes.json()
