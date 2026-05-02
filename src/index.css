@@ -145,10 +145,10 @@ textarea { resize: none; }
 .deal-modal-overlay .deal-modal-box         { animation: modal-box-in  180ms ease-out forwards; }
 .deal-modal-overlay.exiting .deal-modal-box { animation: modal-box-out 180ms ease-in  forwards; }
 
-/* Mobile deal modal — top edge flush below column header */
-/* 80px = board padding-top(18) + column header(62) */
+/* Mobile deal modal — top edge below stage name row */
+/* 47px = board padding-top(18) + col header pad-top(11) + stage name row(18) */
 @media (max-width: 640px) {
-  .deal-modal-overlay { align-items: flex-start !important; padding-top: 80px !important; }
+  .deal-modal-overlay { align-items: flex-start !important; padding-top: 47px !important; }
   .deal-modal-box {
     margin: 0 !important;
     max-width: 100% !important;
