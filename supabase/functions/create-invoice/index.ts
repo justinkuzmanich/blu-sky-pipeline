@@ -208,7 +208,7 @@ Deno.serve(async (req) => {
         primary_recipient: { customer_id: customerId },
         payment_requests:  [{ request_type: 'BALANCE', due_date: dueDateStr }],
         delivery_method:   'SHARE_MANUALLY',
-        title:             address ? `${typeLabel} : ${address}` : typeLabel,
+        title:             invoiceNoteOverride ? `${typeLabel} : ${invoiceNoteOverride}` : address ? `${typeLabel} : ${address}` : typeLabel,
         accepted_payment_methods: {
           card:                true,
           square_gift_card:    false,
