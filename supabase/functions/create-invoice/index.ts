@@ -84,15 +84,25 @@ Deno.serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
   )
 
-  // Parse fields from the first note (used by both Square line item and email)
+  // Parse fields from notes (used by both Square line item and email)
   const typeLabel  = DEAL_TYPE_LABELS[deal.deal_type] || deal.deal_type || 'Service'
-  const noteText   = (deal.notes as any)?.[0]?.text || ''
+  const allNotes   = (deal.notes as any[]) || []
+  const noteText   = allNotes[0]?.text || ''
   const addrMatch  = noteText.match(/Address:\s*([^•\n]+)/)
   const address    = addrMatch?.[1]?.trim() || ''
   const shootMatch = noteText.match(/Shoot date:\s*([^•\n]+)/)
   const shootDate  = shootMatch?.[1]?.trim() || ''
   const msgMatch   = noteText.match(/Message:\s*([^•\n]+)/)
   const message    = msgMatch?.[1]?.trim() || ''
+
+  // Manual override: scan all notes for one starting with "Invoice Note:".
+  // Latest matching note wins (notes are stored newest-first).
+  const invoiceNoteRaw = allNotes
+    .map(n => n?.text || '')
+    .find(t => /^\s*invoice note\s*:/i.test(t)) || ''
+  const invoiceNoteOverride = invoiceNoteRaw
+    .replace(/^\s*invoice note\s*:\s*/i, '')
+    .trim()
 
   let invoiceUrl: string | null = deal.invoice_url
   const squareJustCreated = !deal.invoice_url
@@ -147,7 +157,9 @@ Deno.serve(async (req) => {
     }
 
     // ── 2. Create order — line item + 3.4% Tax ───────────────────
-    const lineNote = [shootDate ? `Shoot date: ${shootDate}` : '', message].filter(Boolean).join(' · ')
+    // "Invoice Note:" override beats the contact-form parsed fields.
+    const lineNote = invoiceNoteOverride
+      || [shootDate ? `Shoot date: ${shootDate}` : '', message].filter(Boolean).join(' · ')
 
     const orderRes  = await sq('/v2/orders', {
       idempotency_key: `order-${deal.id}`,
