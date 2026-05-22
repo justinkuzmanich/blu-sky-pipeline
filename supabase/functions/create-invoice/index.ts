@@ -107,6 +107,10 @@ Deno.serve(async (req) => {
   let invoiceUrl: string | null = deal.invoice_url
   const squareJustCreated = !deal.invoice_url
 
+  // Unique per-invocation suffix so we always get a fresh OPEN order on retry.
+  // The deal.invoice_url guard above prevents duplicate invoices on success.
+  const runKey = crypto.randomUUID().replace(/-/g, '').slice(0, 12)
+
   // ═══ SQUARE: create + publish invoice (skipped if already exists) ═══
   if (squareJustCreated) {
     const squareToken = Deno.env.get('SQUARE_ACCESS_TOKEN')
@@ -141,7 +145,7 @@ Deno.serve(async (req) => {
     } else {
       const parts     = deal.name.trim().split(' ')
       const createRes  = await sq('/v2/customers', {
-        idempotency_key: `cust-${deal.id}`,
+        idempotency_key: `cust-${deal.id}-${runKey}`,
         email_address:   deal.email,
         given_name:      parts[0],
         family_name:     parts.slice(1).join(' ') || '',
@@ -162,7 +166,7 @@ Deno.serve(async (req) => {
       || [shootDate ? `Shoot date: ${shootDate}` : '', message].filter(Boolean).join(' · ')
 
     const orderRes  = await sq('/v2/orders', {
-      idempotency_key: `order-${deal.id}`,
+      idempotency_key: `order-${deal.id}-${runKey}`,
       order: {
         location_id: locationId,
         line_items: [{
@@ -197,7 +201,7 @@ Deno.serve(async (req) => {
     const dueDateStr = dueDate.toISOString().split('T')[0]
 
     const invoiceRes  = await sq('/v2/invoices', {
-      idempotency_key: `inv-${deal.id}`,
+      idempotency_key: `inv-${deal.id}-${runKey}`,
       invoice: {
         location_id:       locationId,
         order_id:          orderId,
@@ -225,7 +229,7 @@ Deno.serve(async (req) => {
 
     // ── 4. Publish → get public_url ───────────────────────────────
     const publishRes  = await sq(`/v2/invoices/${invoiceId}/publish`, {
-      idempotency_key: `pub-${deal.id}`,
+      idempotency_key: `pub-${deal.id}-${runKey}`,
       version:         invoiceVersion,
     })
     const publishData = await publishRes.json()
