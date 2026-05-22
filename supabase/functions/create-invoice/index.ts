@@ -309,7 +309,7 @@ Deno.serve(async (req) => {
             `Best,\nJustin`
 
           const rawEmail = [
-            `From: justin@bluskyfilms.com`,
+            `From: justin.kuzmanich@gmail.com`,
             `To: ${deal.email}`,
             `Subject: Your ${typeLabel} Invoice — Blu Sky Films`,
             `Content-Type: text/plain; charset=utf-8`,
