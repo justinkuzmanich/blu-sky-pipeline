@@ -612,6 +612,22 @@ export default function PipelinePage() {
                   )
                 })}
               </div>
+              {(deal.invoice_url || deal.gmail_draft_id) && (
+                <div style={{ display:'flex', gap:6, marginTop:10, flexWrap:'wrap' }}>
+                  {deal.invoice_url && (
+                    <a href={deal.invoice_url} target="_blank" rel="noopener noreferrer"
+                      style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'5px 10px', background:'var(--cream)', border:`1px solid ${stageColor}`, borderRadius:6, color:stageColor, fontSize:12, textDecoration:'none', fontWeight:600 }}>
+                      🧾 Invoice <span style={{ fontSize:10 }}>↗</span>
+                    </a>
+                  )}
+                  {deal.gmail_draft_id && (
+                    <a href={`https://mail.google.com/mail/u/0/#drafts/${deal.gmail_draft_id}`} target="_blank" rel="noopener noreferrer"
+                      style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'5px 10px', background:'var(--cream)', border:`1px solid ${stageColor}`, borderRadius:6, color:stageColor, fontSize:12, textDecoration:'none', fontWeight:600 }}>
+                      ✉️ Draft <span style={{ fontSize:10 }}>↗</span>
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             <div style={{ display:'flex', borderBottom:'1px solid var(--border-light)', flexShrink:0, background:'var(--cream-mid)' }}>
