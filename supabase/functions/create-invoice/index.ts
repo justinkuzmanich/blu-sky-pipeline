@@ -250,32 +250,11 @@ Deno.serve(async (req) => {
       console.error('Failed to save invoice_url to deal:', updateError)
     }
 
-    // ── 6. Telegram notification (only on fresh Square creation) ──
-    const tgToken  = Deno.env.get('TELEGRAM_BOT_TOKEN')
-    const tgChatId = Deno.env.get('TELEGRAM_CHAT_ID')
-
-    if (tgToken && tgChatId) {
-      const text =
-        '🧾 Invoice created\n\n' +
-        'Deal: '    + deal.name + '\n' +
-        'Amount: $' + Number(deal.value).toFixed(2) + ' + 3.4% tax\n' +
-        'Client: '  + deal.email + '\n\n' +
-        '💳 ' + invoiceUrl + '\n\n' +
-        '👉 https://justinkuzmanich.github.io/blu-sky-pipeline/'
-
-      try {
-        await fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: tgChatId, text }),
-        })
-      } catch (err) {
-        console.error('Telegram notification failed:', err)
-      }
-    }
   }
 
   // ═══ GMAIL: create draft (skipped if one already exists) ═══
+  let gmailDraftLink: string | null = null
+
   if (!deal.gmail_draft_id && invoiceUrl) {
     const gmailClientId     = Deno.env.get('GMAIL_CLIENT_ID')
     const gmailClientSecret = Deno.env.get('GMAIL_CLIENT_SECRET')
@@ -335,10 +314,11 @@ Deno.serve(async (req) => {
             console.error('Failed to create Gmail draft:', await draftRes.text())
           } else {
             const draftData = await draftRes.json()
-            // Save the message ID — that's what Gmail's web URL uses to open the draft
             const draftId = draftData.message?.id ?? draftData.id
 
             if (draftId) {
+              gmailDraftLink = `https://mail.google.com/mail/u/0/#drafts/${draftId}`
+
               const { error: draftUpdateError } = await supabase
                 .from('deals')
                 .update({ gmail_draft_id: draftId })
@@ -353,6 +333,33 @@ Deno.serve(async (req) => {
         }
       } catch (err) {
         console.error('Gmail draft failed:', err)
+      }
+    }
+  }
+
+  // ═══ TELEGRAM: notify after both Square + Gmail are done ═══
+  if (squareJustCreated && invoiceUrl) {
+    const tgToken  = Deno.env.get('TELEGRAM_BOT_TOKEN')
+    const tgChatId = Deno.env.get('TELEGRAM_CHAT_ID')
+
+    if (tgToken && tgChatId) {
+      const text =
+        '🧾 Invoice created\n\n' +
+        'Deal: '    + deal.name + '\n' +
+        'Amount: $' + Number(deal.value).toFixed(2) + ' + 3.4% tax\n' +
+        'Client: '  + deal.email + '\n\n' +
+        '💳 ' + invoiceUrl + '\n' +
+        (gmailDraftLink ? '📧 ' + gmailDraftLink + '\n' : '') +
+        '\n👉 https://justinkuzmanich.github.io/blu-sky-pipeline/'
+
+      try {
+        await fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: tgChatId, text }),
+        })
+      } catch (err) {
+        console.error('Telegram notification failed:', err)
       }
     }
   }
