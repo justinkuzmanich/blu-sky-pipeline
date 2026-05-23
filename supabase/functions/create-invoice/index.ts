@@ -337,17 +337,14 @@ Deno.serve(async (req) => {
     }
   }
 
-  // ═══ TWILIO SMS: notify after both Square + Gmail are done ═══
-  // TODO: move TWILIO_TO_NUMBER into the user's profile row so this works per-user
+  // ═══ TELEGRAM: notify after both Square + Gmail are done ═══
   if (squareJustCreated && invoiceUrl) {
-    const twilioSid   = Deno.env.get('TWILIO_ACCOUNT_SID')
-    const twilioToken = Deno.env.get('TWILIO_AUTH_TOKEN')
-    const twilioFrom  = Deno.env.get('TWILIO_FROM_NUMBER')
-    const twilioTo    = Deno.env.get('TWILIO_TO_NUMBER')
+    const telegramToken  = Deno.env.get('TELEGRAM_BOT_TOKEN')
+    const telegramChatId = Deno.env.get('TELEGRAM_CHAT_ID')
 
-    if (twilioSid && twilioToken && twilioFrom && twilioTo) {
-      const body =
-        '🧾 Invoice created\n\n' +
+    if (telegramToken && telegramChatId) {
+      const text =
+        '🧾 *Invoice created*\n\n' +
         'Deal: '    + deal.name + '\n' +
         'Amount: $' + Number(deal.value).toFixed(2) + ' + 3.4% tax\n' +
         'Client: '  + deal.email + '\n\n' +
@@ -356,22 +353,22 @@ Deno.serve(async (req) => {
         '\n👉 https://justinkuzmanich.github.io/blu-sky-pipeline/'
 
       try {
-        const smsRes  = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
-          method:  'POST',
-          headers: {
-            'Authorization': 'Basic ' + btoa(`${twilioSid}:${twilioToken}`),
-            'Content-Type':  'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({ From: twilioFrom, To: twilioTo, Body: body }),
-        })
-        const smsData = await smsRes.json()
-        if (!smsRes.ok) {
-          console.error('Twilio SMS failed:', JSON.stringify(smsData))
+        const tgRes = await fetch(
+          `https://api.telegram.org/bot${telegramToken}/sendMessage`,
+          {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: telegramChatId, text, parse_mode: 'Markdown' }),
+          }
+        )
+        const tgData = await tgRes.json()
+        if (!tgData.ok) {
+          console.error('Telegram notify failed:', JSON.stringify(tgData))
         } else {
-          console.log('Twilio SMS sent, SID:', smsData.sid)
+          console.log('Telegram notification sent')
         }
       } catch (err) {
-        console.error('Twilio SMS exception:', err)
+        console.error('Telegram notify exception:', err)
       }
     }
   }
