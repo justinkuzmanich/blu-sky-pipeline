@@ -356,7 +356,7 @@ Deno.serve(async (req) => {
         '\n👉 https://justinkuzmanich.github.io/blu-sky-pipeline/'
 
       try {
-        await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
+        const smsRes  = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
           method:  'POST',
           headers: {
             'Authorization': 'Basic ' + btoa(`${twilioSid}:${twilioToken}`),
@@ -364,8 +364,14 @@ Deno.serve(async (req) => {
           },
           body: new URLSearchParams({ From: twilioFrom, To: twilioTo, Body: body }),
         })
+        const smsData = await smsRes.json()
+        if (!smsRes.ok) {
+          console.error('Twilio SMS failed:', JSON.stringify(smsData))
+        } else {
+          console.log('Twilio SMS sent, SID:', smsData.sid)
+        }
       } catch (err) {
-        console.error('Twilio SMS failed:', err)
+        console.error('Twilio SMS exception:', err)
       }
     }
   }
