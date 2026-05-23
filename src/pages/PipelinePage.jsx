@@ -613,17 +613,19 @@ export default function PipelinePage() {
                 })}
               </div>
               {(deal.invoice_url || deal.gmail_draft_id) && (
-                <div style={{ display:'flex', gap:6, marginTop:10, flexWrap:'wrap' }}>
+                <div style={{ display:'flex', flexDirection:'column', gap:7, marginTop:12 }}>
                   {deal.invoice_url && (
                     <a href={deal.invoice_url} target="_blank" rel="noopener noreferrer"
-                      style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'5px 10px', background:'var(--cream)', border:`1px solid ${stageColor}`, borderRadius:6, color:stageColor, fontSize:12, textDecoration:'none', fontWeight:600 }}>
-                      🧾 Invoice <span style={{ fontSize:10 }}>↗</span>
+                      style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 11px', background:'var(--cream)', border:'1px solid var(--border)', borderRadius:7, color:stageColor, fontSize:13, textDecoration:'none', fontWeight:500, boxShadow:'var(--shadow-sm)' }}>
+                      <span>View Invoice</span>
+                      <span style={{ fontSize:11 }}>↗</span>
                     </a>
                   )}
                   {deal.gmail_draft_id && (
                     <a href={`https://mail.google.com/mail/u/0/#drafts/${deal.gmail_draft_id}`} target="_blank" rel="noopener noreferrer"
-                      style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'5px 10px', background:'var(--cream)', border:`1px solid ${stageColor}`, borderRadius:6, color:stageColor, fontSize:12, textDecoration:'none', fontWeight:600 }}>
-                      ✉️ Draft <span style={{ fontSize:10 }}>↗</span>
+                      style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'8px 11px', background:'var(--cream)', border:'1px solid var(--border)', borderRadius:7, color:stageColor, fontSize:13, textDecoration:'none', fontWeight:500, boxShadow:'var(--shadow-sm)' }}>
+                      <span>✉️ Open Gmail Draft</span>
+                      <span style={{ fontSize:11 }}>↗</span>
                     </a>
                   )}
                 </div>
