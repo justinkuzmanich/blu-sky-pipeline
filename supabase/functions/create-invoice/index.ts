@@ -337,13 +337,16 @@ Deno.serve(async (req) => {
     }
   }
 
-  // ═══ TELEGRAM: notify after both Square + Gmail are done ═══
+  // ═══ TWILIO SMS: notify after both Square + Gmail are done ═══
+  // TODO: move TWILIO_TO_NUMBER into the user's profile row so this works per-user
   if (squareJustCreated && invoiceUrl) {
-    const tgToken  = Deno.env.get('TELEGRAM_BOT_TOKEN')
-    const tgChatId = Deno.env.get('TELEGRAM_CHAT_ID')
+    const twilioSid   = Deno.env.get('TWILIO_ACCOUNT_SID')
+    const twilioToken = Deno.env.get('TWILIO_AUTH_TOKEN')
+    const twilioFrom  = Deno.env.get('TWILIO_FROM_NUMBER')
+    const twilioTo    = Deno.env.get('TWILIO_TO_NUMBER')
 
-    if (tgToken && tgChatId) {
-      const text =
+    if (twilioSid && twilioToken && twilioFrom && twilioTo) {
+      const body =
         '🧾 Invoice created\n\n' +
         'Deal: '    + deal.name + '\n' +
         'Amount: $' + Number(deal.value).toFixed(2) + ' + 3.4% tax\n' +
@@ -353,13 +356,16 @@ Deno.serve(async (req) => {
         '\n👉 https://justinkuzmanich.github.io/blu-sky-pipeline/'
 
       try {
-        await fetch('https://api.telegram.org/bot' + tgToken + '/sendMessage', {
+        await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
           method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ chat_id: tgChatId, text }),
+          headers: {
+            'Authorization': 'Basic ' + btoa(`${twilioSid}:${twilioToken}`),
+            'Content-Type':  'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({ From: twilioFrom, To: twilioTo, Body: body }),
         })
       } catch (err) {
-        console.error('Telegram notification failed:', err)
+        console.error('Twilio SMS failed:', err)
       }
     }
   }
