@@ -40,11 +40,13 @@ Two things to know:
    defaults to **Firecrawl** (a scraping API with stealth proxies). Set
    `FIRECRAWL_API_KEY` in `.env`. Without it, the scraper attempts a direct
    fetch that will almost certainly be blocked.
-2. **You must set the Mill Valley store's `loc` id.** It is *not* the public
-   store number. To find it:
-   - Go to https://www.safeway.com and set your store to the Mill Valley one.
-   - Open any aisle/department page and copy the `loc=...` value from the URL.
-   - Paste it into `STORES[].locId` in `src/data/config.js`.
+2. **Stores are pre-configured.** Both Mill Valley Safeways are wired up in
+   `src/data/config.js` with their `loc` ids:
+   - **Camino Alto** (1 Camino Alto) — `loc=788`
+   - **Strawberry Village** (800 Redwood Hwy Frontage Rd #110) — `loc=2718`
+
+   If a store ever returns no products, re-confirm its id: set the store on
+   safeway.com, open any aisle page, and read `loc=...` from the URL.
 
 ---
 

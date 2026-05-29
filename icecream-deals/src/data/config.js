@@ -7,24 +7,23 @@
 // Safeway scopes prices per store using the `loc` query param on shop pages,
 // e.g. https://www.safeway.com/shop/aisles/frozen-foods/ice-cream-novelties.html?loc=3132
 //
-// The `loc` id is NOT the same as the public store number. To find it:
-//   1. Go to https://www.safeway.com and set your store to the Mill Valley one.
-//   2. Open any aisle page and read the `loc=...` value from the URL.
-// Then paste it into `locId` below. Until then the id is a placeholder and the
-// scraper will warn you.
+// The `loc` id is the store's number (from local.safeway.com). The two Mill
+// Valley stores below are pre-filled. If a store ever returns no products,
+// re-confirm its id: set the store on safeway.com, open any aisle page, and
+// read the `loc=...` value from the URL.
 export const STORES = [
   {
-    id: 'mill-valley',
-    name: 'Safeway — Mill Valley',
-    address: '550 Redwood Hwy, Mill Valley, CA 94941',
-    locId: '', // TODO: paste the verified Mill Valley `loc` id here
+    id: 'camino-alto',
+    name: 'Safeway — Camino Alto (Mill Valley)',
+    address: '1 Camino Alto, Mill Valley, CA 94941',
+    locId: '788',
     primary: true,
   },
   {
     id: 'strawberry',
     name: 'Safeway — Strawberry Village (Mill Valley)',
-    address: '800 Redwood Hwy Frontage Rd, Mill Valley, CA 94941',
-    locId: '',
+    address: '800 Redwood Hwy Frontage Rd #110, Mill Valley, CA 94941',
+    locId: '2718',
   },
 ]
 
