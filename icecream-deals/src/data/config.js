@@ -4,18 +4,16 @@
 // ---------------------------------------------------------------------------
 // STORES
 // ---------------------------------------------------------------------------
-// Safeway scopes prices per store using the `loc` query param on shop pages,
-// e.g. https://www.safeway.com/shop/aisles/frozen-foods/ice-cream-novelties.html?loc=3132
-//
-// The `loc` id is the store's number (from local.safeway.com). The two Mill
-// Valley stores below are pre-filled. If a store ever returns no products,
-// re-confirm its id: set the store on safeway.com, open any aisle page, and
-// read the `loc=...` value from the URL.
+// Deals come from Safeway's weekly ad via Flipp, which is keyed by POSTAL CODE.
+// Safeway's weekly ad is therefore regional: both Mill Valley stores (94941)
+// share the same flyer deals. `locId` is the safeway.com store number, kept for
+// reference / future per-store work, but the Flipp source uses `postalCode`.
 export const STORES = [
   {
     id: 'camino-alto',
     name: 'Safeway — Camino Alto (Mill Valley)',
     address: '1 Camino Alto, Mill Valley, CA 94941',
+    postalCode: '94941',
     locId: '788',
     primary: true,
   },
@@ -23,6 +21,7 @@ export const STORES = [
     id: 'strawberry',
     name: 'Safeway — Strawberry Village (Mill Valley)',
     address: '800 Redwood Hwy Frontage Rd #110, Mill Valley, CA 94941',
+    postalCode: '94941',
     locId: '2718',
   },
 ]

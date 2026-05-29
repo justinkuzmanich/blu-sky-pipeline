@@ -27,39 +27,44 @@ can see the UI immediately. Running the scraper replaces it with real data.
 
 ## How the data works (important)
 
-Safeway has **no public API**. The reliable data source is the store-scoped
-shop aisle page:
+Safeway has **no public API**, and its own site (`safeway.com`) is behind an
+Imperva bot-wall that returns HTTP 403 to scrapers. So instead we use **Flipp**
+(`backflipp.wishabi.com`), which syndicates Safeway's weekly ad as clean JSON
+with no bot-wall.
 
-```
-https://www.safeway.com/shop/aisles/frozen-foods/ice-cream-novelties.html?loc=<storeId>
-```
+Things to know:
 
-Two things to know:
+1. **No API key needed on a normal network.** The scraper fetches Flipp
+   directly. `FIRECRAWL_API_KEY` is only needed on network-restricted hosts.
+2. **The weekly ad is regional**, keyed by **postal code**. Both Mill Valley
+   Safeways (94941) share the same flyer deals, so the app shows the same deals
+   under each store. Per-store digital ("for U") coupons are not available from
+   this public source — only the weekly ad.
+3. **Stores are pre-configured** in `src/data/config.js` (Camino Alto &
+   Strawberry Village, both postal code `94941`). `locId` values (788, 2718) are
+   kept for reference but the Flipp source uses `postalCode`.
 
-1. **Safeway blocks plain bots** (returns HTTP 403). The scraper therefore
-   defaults to **Firecrawl** (a scraping API with stealth proxies). Set
-   `FIRECRAWL_API_KEY` in `.env`. Without it, the scraper attempts a direct
-   fetch that will almost certainly be blocked.
-2. **Stores are pre-configured.** Both Mill Valley Safeways are wired up in
-   `src/data/config.js` with their `loc` ids:
-   - **Camino Alto** (1 Camino Alto) — `loc=788`
-   - **Strawberry Village** (800 Redwood Hwy Frontage Rd #110) — `loc=2718`
-
-   If a store ever returns no products, re-confirm its id: set the store on
-   safeway.com, open any aisle page, and read `loc=...` from the URL.
+Endpoints used:
+- `GET /flipp/flyers?postal_code=94941` → find the current Safeway flyer
+- `GET /flipp/flyers/<flyer_id>?postal_code=94941` → that flyer's items
 
 ---
 
 ## Running the scraper
 
 ```bash
-cp .env.example .env   # then fill in values
-npm run scrape:dry     # scrape + write deals.json, print (don't send) emails
+cp .env.example .env   # optional: only needed for email or restricted networks
+npm run scrape:dry     # fetch + write deals.json, print (don't send) emails
 npm run scrape         # real run: sends email if a provider is configured
 ```
 
 The scraper writes `public/data/deals.json` (what the web app reads) and tracks
 state in `scraper/.state.json` so it only emails about *newly* on-sale items.
+
+> Note: `deals.json` currently holds a **real snapshot** of the Mill Valley
+> weekly ad (pulled 2026-05-29) — right now **Häagen-Dazs Gelato is $5.99** and
+> there's no Ben & Jerry's deal. Run `npm run scrape` on an unrestricted network
+> to refresh it.
 
 ---
 
@@ -102,10 +107,10 @@ icecream-deals/
 │   ├── lib/deals.js              # load + format helpers
 │   └── components/               # StatusBanner, BrandSection, DealCard, AlertSignup
 └── scraper/
-    ├── scrape.js                 # Firecrawl + direct-fetch adapters
+    ├── flipp.js                  # Flipp (backflipp) weekly-ad data source
     ├── match.js                  # brand matching + sale detection
     ├── notify.js                 # pluggable email sender
-    └── run.js                    # orchestrator (scrape → diff → write → alert)
+    └── run.js                    # orchestrator (fetch → diff → write → alert)
 ```
 
 ---

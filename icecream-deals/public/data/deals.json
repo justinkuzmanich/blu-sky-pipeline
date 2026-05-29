@@ -1,7 +1,7 @@
 {
-  "_note": "SAMPLE DATA so the UI renders before the scraper is wired to live stores. Replace by running `npm run scrape`, which overwrites this file with real Safeway data.",
-  "isSample": true,
-  "checkedAt": "2026-05-29T13:00:00.000Z",
+  "_note": "Real snapshot of Safeway's Mill Valley (94941) weekly ad pulled from Flipp on 2026-05-29. Re-run `npm run scrape` to refresh.",
+  "isSample": false,
+  "checkedAt": "2026-05-29T13:30:00.000Z",
   "stores": [
     {
       "id": "camino-alto",
@@ -9,34 +9,14 @@
       "address": "1 Camino Alto, Mill Valley, CA 94941",
       "deals": [
         {
-          "id": "sample-ca-hd-1",
+          "id": "flyer-haagen-dazs-gelato",
           "brandId": "haagen-dazs",
-          "name": "Häagen-Dazs Vanilla Ice Cream, 14 oz",
-          "price": 4.99,
-          "regularPrice": 6.49,
-          "onSale": true,
-          "dealText": "Safeway for U member price",
-          "validTo": "2026-06-02"
-        },
-        {
-          "id": "sample-ca-hd-2",
-          "brandId": "haagen-dazs",
-          "name": "Häagen-Dazs Salted Caramel Ice Cream, 14 oz",
-          "price": 6.49,
-          "regularPrice": 6.49,
-          "onSale": false,
-          "dealText": "",
-          "validTo": null
-        },
-        {
-          "id": "sample-ca-bj-1",
-          "brandId": "ben-jerrys",
-          "name": "Ben & Jerry's Half Baked Ice Cream, 16 oz",
+          "name": "Haagen-Dazs Gelato 14-oz. 4-ct.",
           "price": 5.99,
           "regularPrice": 5.99,
-          "onSale": false,
-          "dealText": "",
-          "validTo": null
+          "onSale": true,
+          "dealText": "Weekly ad price",
+          "validTo": "2026-06-02"
         }
       ]
     },
@@ -46,34 +26,14 @@
       "address": "800 Redwood Hwy Frontage Rd #110, Mill Valley, CA 94941",
       "deals": [
         {
-          "id": "sample-sv-hd-1",
+          "id": "flyer-haagen-dazs-gelato",
           "brandId": "haagen-dazs",
-          "name": "Häagen-Dazs Vanilla Ice Cream, 14 oz",
-          "price": 6.49,
-          "regularPrice": 6.49,
-          "onSale": false,
-          "dealText": "",
-          "validTo": null
-        },
-        {
-          "id": "sample-sv-bj-1",
-          "brandId": "ben-jerrys",
-          "name": "Ben & Jerry's Chocolate Fudge Brownie, 16 oz",
-          "price": 4.99,
-          "regularPrice": 5.99,
-          "onSale": true,
-          "dealText": "Sale — 15% off",
-          "validTo": "2026-06-02"
-        },
-        {
-          "id": "sample-sv-bj-2",
-          "brandId": "ben-jerrys",
-          "name": "Ben & Jerry's Cookie Dough Ice Cream, 16 oz",
+          "name": "Haagen-Dazs Gelato 14-oz. 4-ct.",
           "price": 5.99,
           "regularPrice": 5.99,
-          "onSale": false,
-          "dealText": "",
-          "validTo": null
+          "onSale": true,
+          "dealText": "Weekly ad price",
+          "validTo": "2026-06-02"
         }
       ]
     }

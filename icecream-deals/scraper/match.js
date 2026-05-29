@@ -32,7 +32,8 @@ export function toDeal(raw, idx) {
   const hasDealSignal = /member|for u|sale|% off|\$ off|coupon|save|bogo|buy one/i.test(
     dealText
   )
-  const onSale = Boolean(hasPriceDrop || (hasDealSignal && price != null))
+  // Items pulled from the weekly ad flyer are featured deals by definition.
+  const onSale = Boolean(raw.fromFlyer || hasPriceDrop || (hasDealSignal && price != null))
 
   return {
     id: raw.id || `${brand.id}-${idx}`,

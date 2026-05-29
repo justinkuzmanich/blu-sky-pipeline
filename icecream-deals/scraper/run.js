@@ -1,16 +1,19 @@
 // Orchestrates one check across all configured stores:
-//   scrape -> normalize -> diff against last run -> write deals.json for the
-//   web app -> email alerts for newly-on-sale items.
+//   fetch Safeway weekly ad (via Flipp) -> normalize -> diff against last run
+//   -> write deals.json for the web app -> email alerts for newly-on-sale items.
+//
+// Safeway's weekly ad is regional (keyed by postal code), so stores that share
+// a postal code share a flyer; we fetch each postal code only once.
 //
 // Usage:
 //   node scraper/run.js            # real run (sends email if configured)
-//   DRY_RUN=1 node scraper/run.js  # scrape + write, but only print emails
+//   DRY_RUN=1 node scraper/run.js  # fetch + write, but only print emails
 
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { STORES } from '../src/data/config.js'
-import { scrapeStore } from './scrape.js'
+import { fetchSafewayDeals } from './flipp.js'
 import { toDeals } from './match.js'
 import { notify } from './notify.js'
 
@@ -27,60 +30,44 @@ async function readJson(path, fallback) {
   }
 }
 
-async function checkStore(store, prevOnSaleByStore) {
-  console.log(`\n🍦 Checking ${store.name} (loc=${store.locId || 'UNSET'})…`)
-  const raw = await scrapeStore(store)
-  const deals = toDeals(raw)
-  const nowOnSale = deals.filter((d) => d.onSale)
-  console.log(
-    `   ${deals.length} tracked products, ${nowOnSale.length} on sale.`
-  )
-
-  const prev = new Set(prevOnSaleByStore[store.id] || [])
-  const newlyOnSale = nowOnSale.filter((d) => !prev.has(d.id))
-
-  return {
-    storeOut: {
-      id: store.id,
-      name: store.name,
-      address: store.address,
-      deals,
-    },
-    onSaleIds: nowOnSale.map((d) => d.id),
-    newlyOnSale,
-    store,
-  }
-}
-
 async function main() {
   const prevState = await readJson(STATE_FILE, { onSaleByStore: {} })
   const prevOnSaleByStore = prevState.onSaleByStore || {}
 
-  const storesOut = []
-  const nextOnSaleByStore = {}
-  let failures = 0
-
+  // Fetch each unique postal code once.
+  const rawByPostal = {}
   for (const store of STORES) {
-    if (!store.locId) {
-      console.warn(`   Skipping ${store.name}: no locId set.`)
-      continue
-    }
-    try {
-      const r = await checkStore(store, prevOnSaleByStore)
-      storesOut.push(r.storeOut)
-      nextOnSaleByStore[store.id] = r.onSaleIds
-      if (r.newlyOnSale.length) {
-        console.log(`   🎉 ${r.newlyOnSale.length} newly on sale — alerting.`)
-        await notify(r.store, r.newlyOnSale)
-      }
-    } catch (err) {
-      failures++
-      console.error(`   ✗ ${store.name} failed: ${err.message}`)
-    }
+    if (rawByPostal[store.postalCode]) continue
+    console.log(`\n🍦 Fetching Safeway weekly ad for ${store.postalCode}…`)
+    rawByPostal[store.postalCode] = await fetchSafewayDeals(store.postalCode)
+    console.log(`   ${rawByPostal[store.postalCode].length} flyer items.`)
   }
 
-  if (!storesOut.length) {
-    throw new Error('No stores scraped successfully — nothing written.')
+  const storesOut = []
+  const nextOnSaleByStore = {}
+
+  for (const store of STORES) {
+    const deals = toDeals(rawByPostal[store.postalCode])
+    const nowOnSale = deals.filter((d) => d.onSale)
+    console.log(
+      `   ${store.name}: ${deals.length} tracked-brand items, ${nowOnSale.length} on sale.`
+    )
+
+    const prev = new Set(prevOnSaleByStore[store.id] || [])
+    const newlyOnSale = nowOnSale.filter((d) => !prev.has(d.id))
+
+    storesOut.push({
+      id: store.id,
+      name: store.name,
+      address: store.address,
+      deals,
+    })
+    nextOnSaleByStore[store.id] = nowOnSale.map((d) => d.id)
+
+    if (newlyOnSale.length) {
+      console.log(`   🎉 ${newlyOnSale.length} newly on sale — alerting.`)
+      await notify(store, newlyOnSale)
+    }
   }
 
   await mkdir(dirname(DEALS_OUT), { recursive: true })
@@ -98,11 +85,9 @@ async function main() {
     STATE_FILE,
     JSON.stringify({ onSaleByStore: nextOnSaleByStore }, null, 2)
   )
-
-  if (failures) console.warn(`⚠️  ${failures} store(s) failed to scrape.`)
 }
 
 main().catch((err) => {
-  console.error('✗ Scrape failed:', err.message)
+  console.error('✗ Run failed:', err.message)
   process.exit(1)
 })
