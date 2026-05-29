@@ -1,0 +1,52 @@
+{
+  "_note": "SAMPLE DATA so the UI renders before the scraper is wired to a live store. Replace by running `npm run scrape`, which overwrites this file with real Safeway data.",
+  "isSample": true,
+  "store": {
+    "id": "mill-valley",
+    "name": "Safeway — Mill Valley",
+    "address": "550 Redwood Hwy, Mill Valley, CA 94941"
+  },
+  "checkedAt": "2026-05-29T13:00:00.000Z",
+  "deals": [
+    {
+      "id": "sample-hd-1",
+      "brandId": "haagen-dazs",
+      "name": "Häagen-Dazs Vanilla Ice Cream, 14 oz",
+      "price": 4.99,
+      "regularPrice": 6.49,
+      "onSale": true,
+      "dealText": "Safeway for U member price",
+      "validTo": "2026-06-02"
+    },
+    {
+      "id": "sample-hd-2",
+      "brandId": "haagen-dazs",
+      "name": "Häagen-Dazs Salted Caramel Ice Cream, 14 oz",
+      "price": 6.49,
+      "regularPrice": 6.49,
+      "onSale": false,
+      "dealText": "",
+      "validTo": null
+    },
+    {
+      "id": "sample-bj-1",
+      "brandId": "ben-jerrys",
+      "name": "Ben & Jerry's Half Baked Ice Cream, 16 oz",
+      "price": 5.99,
+      "regularPrice": 5.99,
+      "onSale": false,
+      "dealText": "",
+      "validTo": null
+    },
+    {
+      "id": "sample-bj-2",
+      "brandId": "ben-jerrys",
+      "name": "Ben & Jerry's Chocolate Fudge Brownie, 16 oz",
+      "price": 5.99,
+      "regularPrice": 5.99,
+      "onSale": false,
+      "dealText": "",
+      "validTo": null
+    }
+  ]
+}
