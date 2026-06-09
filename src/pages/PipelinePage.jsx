@@ -180,7 +180,10 @@ export default function PipelinePage() {
   const noStepDeals  = activeDeals.filter(d => !d.next_step && d.stage < stages.length - 1)
 
   const handleAddDeal = async () => {
-    if (!form.name.trim()) { setFormError('Name is required'); return }
+    if (!form.name.trim())  { setFormError('Name is required'); return }
+    if (!form.email.trim()) { setFormError('Email is required'); return }
+    if (!/^\S+@\S+\.\S+$/.test(form.email.trim())) { setFormError('Enter a valid email'); return }
+    if (!(parseFloat(form.value) > 0)) { setFormError('Deal value is required'); return }
     setFormError('')
     const { error } = await addDeal({
       stage: formStage,
@@ -810,7 +813,7 @@ export default function PipelinePage() {
                 { key:'name',     label:'Name *',   placeholder:'Full name',         ref:nameRef },
                 { key:'business', label:'Business', placeholder:'Company name' },
                 { key:'phone',    label:'Phone',    placeholder:'(415) 000-0000',    type:'tel' },
-                { key:'email',    label:'Email',    placeholder:'email@domain.com',  type:'email' },
+                { key:'email',    label:'Email *',  placeholder:'email@domain.com',  type:'email' },
               ].map(({ key, label, placeholder, type, ref }) => (
                 <div key={key}>
                   <Label>{label}</Label>
@@ -820,7 +823,7 @@ export default function PipelinePage() {
                 </div>
               ))}
               <div>
-                <Label>Deal Value</Label>
+                <Label>Deal Value *</Label>
                 <FieldInput type="number" value={form.value} placeholder="0" mono
                   onChange={e=>setForm(f => ({ ...f, value: e.target.value }))}
                   onKeyDown={e=>e.key==='Enter'&&handleAddDeal()} />
