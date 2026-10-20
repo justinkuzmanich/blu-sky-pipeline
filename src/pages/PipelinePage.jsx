@@ -104,6 +104,7 @@ export default function PipelinePage() {
   const [nsDraft, setNsDraft]           = useState(null)
   const [dragId, setDragId]             = useState(null)
   const [dragOver, setDragOver]         = useState(null)
+  const [dragOverCard, setDragOverCard] = useState(null)
   const [view, setView]                 = useState('board')
   const [formError, setFormError]       = useState('')
   const [stagesOpen, setStagesOpen]     = useState(true)
@@ -159,6 +160,18 @@ export default function PipelinePage() {
     upd(id, { status })
     setStatusMenuId(null)
     if (panelId === id) closeModal()
+  }
+
+  const reorderDeals = (draggedId, targetId, targetStage) => {
+    const stageDeals = activeDeals
+      .filter(d => d.stage === targetStage)
+      .slice()
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+    const dragged = deals.find(d => d.id === draggedId)
+    const filtered = stageDeals.filter(d => d.id !== draggedId)
+    const targetIdx = filtered.findIndex(d => d.id === targetId)
+    filtered.splice(targetIdx, 0, dragged)
+    filtered.forEach((d, i) => upd(d.id, { sort_order: i, stage: targetStage }))
   }
 
   // ── Computed sets ──────────────────────────────────────────────
@@ -417,7 +430,7 @@ export default function PipelinePage() {
           {stages.map((stage, si) => {
             const dot   = STAGE_COLORS[si] || STAGE_COLORS[0]
             const sbg   = STAGE_BG[si]     || STAGE_BG[0]
-            const stDeals = activeDeals.filter(d => d.stage === si)
+            const stDeals = activeDeals.filter(d => d.stage === si).slice().sort((a,b) => (a.sort_order??0)-(b.sort_order??0))
             const isLast  = si === stages.length - 1
             return (
               <div key={si}
@@ -425,7 +438,7 @@ export default function PipelinePage() {
                 className={`drop-zone stage-col${dragOver === si ? ' drag-over' : ''}`}
                 onDragOver={e => { e.preventDefault(); setDragOver(si) }}
                 onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOver(null) }}
-                onDrop={e => { e.preventDefault(); if (dragId) upd(dragId, { stage: si }); setDragId(null); setDragOver(null) }}
+                onDrop={e => { e.preventDefault(); if (dragId && !dragOverCard) upd(dragId, { stage: si }); setDragId(null); setDragOver(null); setDragOverCard(null) }}
                 style={{ flex:'1 1 180px', maxWidth:330, minWidth:180, margin:'0 6px', background:'var(--col-bg)', borderRadius:12, border:'1px solid var(--col-border)', display:'flex', flexDirection:'column', maxHeight:'100%', minHeight:260, boxShadow:'0 2px 8px rgba(0,0,0,0.14), 0 1px 2px rgba(0,0,0,0.08)' }}>
                 <div style={{ padding:'11px 13px 9px', borderBottom:'1px solid var(--col-divider)' }}>
                   <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', gap:6 }}>
@@ -455,9 +468,12 @@ export default function PipelinePage() {
                       <div key={d.id} className="deal-card"
                         draggable="true"
                         onDragStart={e => { setDragId(d.id); e.dataTransfer.effectAllowed = 'move' }}
-                        onDragEnd={() => { setDragId(null); setDragOver(null) }}
+                        onDragEnd={() => { setDragId(null); setDragOver(null); setDragOverCard(null) }}
+                        onDragOver={e => { e.preventDefault(); e.stopPropagation(); setDragOverCard(d.id) }}
+                        onDragLeave={e => { if (!e.currentTarget.contains(e.relatedTarget)) setDragOverCard(null) }}
+                        onDrop={e => { e.preventDefault(); e.stopPropagation(); if (dragId && dragId !== d.id) reorderDeals(dragId, d.id, si); setDragId(null); setDragOver(null); setDragOverCard(null) }}
                         onClick={()=>openPanel(d.id)}
-                        style={{ background:'var(--card-bg)', border:`1px solid ${panelId===d.id ? dot : 'var(--card-border)'}`, borderRadius:9, padding:'11px 12px', marginBottom:6, cursor:'grab', opacity: dragId===d.id ? 0.45 : 1, transition:'opacity 0.15s', position:'relative' }}>
+                        style={{ background:'var(--card-bg)', border:`1px solid ${dragOverCard===d.id ? dot : panelId===d.id ? dot : 'var(--card-border)'}`, borderRadius:9, padding:'11px 12px', marginBottom:6, cursor:'grab', opacity: dragId===d.id ? 0.45 : 1, transition:'opacity 0.15s, border-color 0.1s', position:'relative', boxShadow: dragOverCard===d.id ? `0 0 0 2px ${dot}55` : 'none' }}>
                         <div style={{ display:'flex', justifyContent:'space-between', gap:6, alignItems:'flex-start' }}>
                           <div style={{ flex:1, minWidth:0 }}>
                             <div style={{ fontWeight:600, fontSize:15.5, color:'var(--text-1)', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{d.name}</div>
